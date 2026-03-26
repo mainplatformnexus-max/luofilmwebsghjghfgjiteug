@@ -182,7 +182,7 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="carousel-wrapper" style={{ display: "flex", gap: 8, padding: "10px 12px", boxSizing: "border-box" }}>
-          <div style={{ flex: "0 0 auto", position: "relative", width: "100%" }}>
+          <div className="carousel-main-wrap" style={{ flex: "0 0 auto", position: "relative", width: "100%" }}>
             <div className="carousel-mobile-full" style={{ width: "calc(56vw - 20px)", minWidth: 480, maxWidth: 760, position: "relative", overflow: "hidden", borderRadius: 6, background: "#1a1a1a" }}>
               <div style={{ paddingTop: "56.25%" }} />
               <img
