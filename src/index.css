@@ -650,6 +650,19 @@ input, button, select, textarea {
   .play-recommended-grid {
     grid-template-columns: repeat(3, 1fr) !important;
     gap: 7px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+  }
+  .play-recommended-grid > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  .play-recommended-grid > * > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
   }
 
   /* Watchlist grid */
