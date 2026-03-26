@@ -62,6 +62,24 @@ function toShow(d: any): Show {
 export default function PlayPage() {
   const params = useParams<{ id: string }>();
   const { user } = useAuth();
+
+  // Block DevTools keyboard shortcuts on this page
+  useEffect(() => {
+    const block = (e: KeyboardEvent) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C", "i", "j", "c"].includes(e.key)) ||
+        (e.ctrlKey && ["U", "u"].includes(e.key)) ||
+        (e.metaKey && e.altKey && ["I", "i", "J", "j", "C", "c"].includes(e.key))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    document.addEventListener("keydown", block, true);
+    return () => document.removeEventListener("keydown", block, true);
+  }, []);
+
   const [show, setShow] = useState<Show | null>(null);
   const [rawData, setRawData] = useState<any>(null);
   const [episodes, setEpisodes] = useState<any[]>([]);

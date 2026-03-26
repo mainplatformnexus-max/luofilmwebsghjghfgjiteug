@@ -1,5 +1,51 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 
+function useDevToolsDetection(onOpen: () => void, onClose: () => void) {
+  useEffect(() => {
+    let isOpen = false;
+
+    // Technique 1: window size delta (works for docked DevTools)
+    const checkSize = () => {
+      const wDiff = window.outerWidth - window.innerWidth;
+      const hDiff = window.outerHeight - window.innerHeight;
+      return wDiff > 160 || hDiff > 160;
+    };
+
+    // Technique 2: console timing trick (works for undocked/detached)
+    const checkConsole = () => {
+      let opened = false;
+      const el = document.createElement("div");
+      Object.defineProperty(el, "id", {
+        get() {
+          opened = true;
+          return "";
+        },
+        configurable: true,
+      });
+      console.log("%c", el);
+      return opened;
+    };
+
+    const check = () => {
+      const detected = checkSize() || checkConsole();
+      if (detected && !isOpen) {
+        isOpen = true;
+        onOpen();
+      } else if (!detected && isOpen) {
+        isOpen = false;
+        onClose();
+      }
+      if (isOpen) {
+        try { console.clear(); } catch (_) {}
+        try { performance.clearResourceTimings(); } catch (_) {}
+      }
+    };
+
+    const id = setInterval(check, 800);
+    return () => clearInterval(id);
+  }, [onOpen, onClose]);
+}
+
 interface SubtitleTrack {
   src: string;
   label: string;
@@ -43,6 +89,19 @@ export default function VideoPlayer({ src, poster, title, onEnded, subtitles = [
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverX, setHoverX] = useState(0);
   const [showPlay, setShowPlay] = useState(false);
+  const [devtoolsOpen, setDevtoolsOpen] = useState(false);
+
+  const handleDevToolsOpen = useCallback(() => {
+    const v = videoRef.current;
+    if (v && !v.paused) v.pause();
+    setDevtoolsOpen(true);
+  }, []);
+
+  const handleDevToolsClose = useCallback(() => {
+    setDevtoolsOpen(false);
+  }, []);
+
+  useDevToolsDetection(handleDevToolsOpen, handleDevToolsClose);
 
   const resetHideTimer = useCallback(() => {
     setShowControls(true);
@@ -222,11 +281,40 @@ export default function VideoPlayer({ src, poster, title, onEnded, subtitles = [
         ))}
       </video>
 
+      {/* DevTools protection overlay */}
+      {devtoolsOpen && (
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 20,
+          background: "rgba(0,0,0,0.97)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 14,
+          userSelect: "none",
+        }}>
+          <div style={{
+            width: 60, height: 60, borderRadius: "50%",
+            background: "rgba(255,80,80,0.12)",
+            border: "2px solid rgba(255,80,80,0.35)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5050" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 15, fontWeight: 700, margin: 0, textAlign: "center" }}>
+            Playback Paused
+          </p>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: 0, textAlign: "center", maxWidth: 240, lineHeight: 1.6 }}>
+            Developer tools detected. Close them to continue watching.
+          </p>
+        </div>
+      )}
+
       {/* Click to play/pause overlay */}
       <div
         style={{ position: "absolute", inset: 0, zIndex: 1, cursor: showControls ? "default" : "none" }}
-        onClick={togglePlay}
-        onDoubleClick={toggleFullscreen}
+        onClick={devtoolsOpen ? undefined : togglePlay}
+        onDoubleClick={devtoolsOpen ? undefined : toggleFullscreen}
       />
 
       {/* Loading spinner */}
