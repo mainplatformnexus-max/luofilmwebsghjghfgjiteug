@@ -48,7 +48,7 @@ export default function WatchlistPage() {
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Log in to see your saved shows.</p>
           </div>
         ) : loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
+          <div className="watchlist-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
             {[1,2,3,4,5,6].map(i => (
               <div key={i} style={{ paddingTop: "133%", borderRadius: 8, background: "#1a1a1a", animation: "pulse 1.2s ease-in-out infinite" }} />
             ))}
@@ -65,7 +65,7 @@ export default function WatchlistPage() {
             </Link>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
+          <div className="watchlist-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 14 }}>
             {items.map((item) => (
               <div key={item.contentId} style={{ position: "relative" }}>
                 <Link href={`/play/${item.contentId}`}>
