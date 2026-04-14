@@ -174,24 +174,24 @@ export default function Header() {
               <div
                 className="desktop-only"
                 style={{
-                  display: "flex", alignItems: "center", gap: 5,
-                  padding: "0 10px", height: 28, borderRadius: 14,
-                  background: "rgba(0,169,245,0.12)",
-                  border: "1px solid rgba(0,169,245,0.35)",
-                  color: "#69d7ff", fontSize: 11, fontWeight: 800,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  padding: "0 12px", height: 28, borderRadius: 14,
+                  background: "rgba(0,169,245,0.16)",
+                  border: "1px solid rgba(0,169,245,0.45)",
+                  color: "#8be1ff", fontSize: 11, fontWeight: 800,
                   cursor: "pointer", flexShrink: 0, letterSpacing: "0.04em",
                   marginLeft: 8,
+                  textTransform: "uppercase",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.2)";
+                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.26)";
                   (e.currentTarget as HTMLElement).style.color = "#fff";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.12)";
-                  (e.currentTarget as HTMLElement).style.color = "#69d7ff";
+                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.16)";
+                  (e.currentTarget as HTMLElement).style.color = "#8be1ff";
                 }}
               >
-                <Download size={12} />
                 DOWNLOAD APP
               </div>
             </Link>
