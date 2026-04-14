@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { User, Clock, Bookmark, Download, LogOut, Smartphone } from "lucide-react";
 import VIPModal from "./VIPModal";
 import AuthModal from "./AuthModal";
+import DownloadAppModal from "./DownloadAppModal";
 import { useAuth } from "../contexts/AuthContext";
 
 const ADMIN_EMAILS = ["mainplatform.nexus@gmail.com"];
@@ -25,6 +26,18 @@ export default function Header() {
   const [showAuth, setShowAuth] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+  useEffect(() => {
+    const seen = sessionStorage.getItem("lf_dl_modal_shown");
+    if (!seen) {
+      const t = setTimeout(() => {
+        setShowDownloadModal(true);
+        sessionStorage.setItem("lf_dl_modal_shown", "1");
+      }, 4000);
+      return () => clearTimeout(t);
+    }
+  }, []);
 
   const { user, profile, logout } = useAuth();
 
@@ -170,22 +183,22 @@ export default function Header() {
               )}
             </div>
 
-            <Link href="/downloads">
-              <div
-                className="download-app-button header-download-app-button header-shine-step-1"
-              >
-                <span className="download-app-button-glow" />
-                <span className="download-app-button-shine" />
-                <span className="download-app-button-icon header-download-app-button-icon">
-                  <Smartphone size={14} />
-                </span>
-                <span className="download-app-button-copy">
-                  <span className="download-app-button-title header-download-app-button-title">Download App</span>
-                  <span className="download-app-button-subtitle header-download-app-button-subtitle">Android & iOS</span>
-                </span>
-                <Download className="download-app-button-arrow header-download-app-button-arrow" size={14} />
-              </div>
-            </Link>
+            <div
+              className="download-app-button header-download-app-button header-shine-step-1"
+              onClick={() => setShowDownloadModal(true)}
+              style={{ cursor: "pointer" }}
+            >
+              <span className="download-app-button-glow" />
+              <span className="download-app-button-shine" />
+              <span className="download-app-button-icon header-download-app-button-icon">
+                <Smartphone size={14} />
+              </span>
+              <span className="download-app-button-copy">
+                <span className="download-app-button-title header-download-app-button-title">Download App</span>
+                <span className="download-app-button-subtitle header-download-app-button-subtitle">Android & iOS</span>
+              </span>
+              <Download className="download-app-button-arrow header-download-app-button-arrow" size={14} />
+            </div>
 
             {/* Mobile search icon */}
             <button
@@ -332,6 +345,7 @@ export default function Header() {
 
       {showVIP && <VIPModal onClose={() => setShowVIP(false)} onOpenAuth={() => { setShowVIP(false); setShowAuth(true); }} />}
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {showDownloadModal && <DownloadAppModal onClose={() => setShowDownloadModal(false)} />}
     </>
   );
 }
