@@ -76,6 +76,8 @@ function carouselToShow(item: CarouselItem, contentMap: Map<string, Show>): Show
 export default function HomePage() {
   const [shows, setShows] = useState<Show[]>([]);
   const [bannerShows, setBannerShows] = useState<Show[]>([]);
+  const [secondaryShows, setSecondaryShows] = useState<Show[]>([]);
+  const [featuredShows, setFeaturedShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -93,26 +95,50 @@ export default function HomePage() {
     Promise.all([
       fbApi.publicContent.listAll(),
       fbApi.publicContent.getCarousel(),
+      fbApi.publicContent.getSecondaryCarousel(),
+      fbApi.publicContent.getHomeFeatured(),
     ])
-      .then(([contentDocs, carouselItems]) => {
+      .then(([contentDocs, carouselItems, secondaryItems, featuredItems]) => {
         const allShows = contentDocs.map(toShow);
         setShows(allShows);
 
         const contentMap = new Map<string, Show>(allShows.map(s => [s.id, s]));
+
+        // Main left carousel (page === "home")
         const homeCarousel = (carouselItems as CarouselItem[])
           .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
-
         const banners: Show[] = [];
         for (const item of homeCarousel) {
           const s = carouselToShow(item, contentMap);
           if (s) banners.push(s);
         }
-
         if (banners.length > 0) {
           setBannerShows(banners);
         } else if (allShows.length > 0) {
           setBannerShows(allShows.slice(0, 6));
         }
+
+        // Right secondary carousel (page === "carousel2")
+        const secondary: Show[] = [];
+        for (const item of secondaryItems as CarouselItem[]) {
+          const s = carouselToShow(item, contentMap);
+          if (s) secondary.push(s);
+        }
+        if (secondary.length > 0) {
+          setSecondaryShows(secondary);
+        } else if (allShows.length > 0) {
+          setSecondaryShows(allShows.slice(0, 6));
+        }
+
+        // Middle featured panel (page === "home" in featured collection)
+        const featured: Show[] = [];
+        for (const item of featuredItems as any[]) {
+          if (item.contentId) {
+            const s = contentMap.get(item.contentId);
+            if (s) featured.push(s);
+          }
+        }
+        setFeaturedShows(featured);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -165,8 +191,9 @@ export default function HomePage() {
 
   const currentIdx = bannerShows.length > 0 ? Math.min(activeSlide, bannerShows.length - 1) : 0;
   const currentShow = bannerShows[currentIdx];
-  const sideShows = bannerShows.filter((_, i) => i !== currentIdx).slice(0, 2);
-  const miniShows = shows.slice(bannerShows.length, bannerShows.length + 4);
+  const midPanel = featuredShows.length > 0 ? featuredShows : bannerShows.filter((_, i) => i !== currentIdx);
+  const sideShows = midPanel.slice(0, 2);
+  const miniShows = midPanel.slice(2, 6);
 
   const movies = shows.filter(s => s.type === "movie");
   const series = shows.filter(s => s.type === "series");
@@ -249,7 +276,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <SecondaryCarousel shows={bannerShows} />
+          <SecondaryCarousel shows={secondaryShows} />
         </div>
       )}
 
