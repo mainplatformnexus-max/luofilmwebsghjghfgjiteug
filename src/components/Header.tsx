@@ -34,7 +34,7 @@ export default function Header() {
       const t = setTimeout(() => {
         setShowDownloadModal(true);
         sessionStorage.setItem("lf_dl_modal_shown", "1");
-      }, 4000);
+      }, 2000);
       return () => clearTimeout(t);
     }
   }, []);
