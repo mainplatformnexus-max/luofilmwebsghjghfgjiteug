@@ -1,5 +1,16 @@
 import { useEffect } from "react";
-import { X, Download, Monitor } from "lucide-react";
+import { X } from "lucide-react";
+
+// Image: 612×408 with transparent bg.
+// After -trim, visible content is 493×323 at offset +59+42.
+//
+// Button coords in original image (visual estimate from rendered image):
+//   Box1 (Download):        x≈365–445, y≈280–322  → in original px
+//   Box2 (Continue Online): x≈455–535, y≈280–322
+//
+// Mapped to the cropped content (493×323) coordinate space:
+//   Box1: left=(365-59)/493=62.1%  top=(280-42)/323=73.7%  w=80/493=16.2%  h=42/323=13%
+//   Box2: left=(455-59)/493=80.3%  top=(280-42)/323=73.7%  w=80/493=16.2%  h=42/323=13%
 
 const APP_DOWNLOAD_URL = "https://luofilm.site/download";
 
@@ -14,29 +25,9 @@ export default function DownloadAppModal({ onClose }: Props) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const btnBase: React.CSSProperties = {
-    position: "absolute",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "6%",
-    borderRadius: "8px",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-    transition: "filter 0.15s, transform 0.15s",
-    padding: "0 4%",
-    boxSizing: "border-box",
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textDecoration: "none",
-    fontFamily: "inherit",
-  };
-
   return (
     <>
-      {/* Blurred backdrop */}
+      {/* Blurred backdrop — click to close */}
       <div
         onClick={onClose}
         style={{
@@ -59,11 +50,12 @@ export default function DownloadAppModal({ onClose }: Props) {
           transform: "translate(-50%, -50%)",
           zIndex: 9000,
           width: "min(600px, 94vw)",
-          background: "#000",
           borderRadius: "20px",
           overflow: "hidden",
           boxShadow: "0 32px 80px rgba(0,0,0,0.85), 0 8px 28px rgba(0,0,0,0.6)",
           animation: "dlFloatIn 0.36s cubic-bezier(0.34,1.35,0.64,1)",
+          background: "#000",
+          lineHeight: 0,
         }}
       >
         {/* Close button */}
@@ -78,8 +70,8 @@ export default function DownloadAppModal({ onClose }: Props) {
             width: 28,
             height: 28,
             borderRadius: "50%",
-            background: "rgba(0,0,0,0.7)",
-            border: "1px solid rgba(255,255,255,0.25)",
+            background: "rgba(0,0,0,0.75)",
+            border: "1px solid rgba(255,255,255,0.3)",
             color: "#fff",
             cursor: "pointer",
             display: "flex",
@@ -89,91 +81,131 @@ export default function DownloadAppModal({ onClose }: Props) {
             padding: 0,
           }}
           onMouseEnter={e => (e.currentTarget.style.background = "rgba(210,25,25,0.9)")}
-          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.7)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.75)")}
         >
           <X size={13} style={{ pointerEvents: "none" }} />
         </button>
 
-        {/* Image + overlay buttons */}
-        <div style={{ position: "relative", lineHeight: 0, userSelect: "none" }}>
+        {/* ── Image crop wrapper ────────────────────────────────────────────
+            Container uses the exact CONTENT aspect-ratio (493:323) so no
+            transparent gutters are ever visible.
+            The <img> is scaled up and shifted to clip away the empty margins.
+        ──────────────────────────────────────────────────────────────────── */}
+        <div
+          style={{
+            position: "relative",
+            width: "100%",
+            /* aspect-ratio = content W / content H = 493 / 323 */
+            aspectRatio: "493 / 323",
+            overflow: "hidden",
+          }}
+        >
           <img
             src="/download-app-banner.png"
             alt="Download LUOFILM App"
             draggable={false}
-            style={{ width: "100%", display: "block" }}
+            style={{
+              position: "absolute",
+              /* scale so content-width fills container: 612/493 ≈ 124.1% */
+              width: "124.14%",
+              /* shift left to hide transparent left margin (59 / 493 * 100) */
+              left: "-11.97%",
+              /* shift up to hide transparent top margin (42 / 493 * 100)   */
+              top: "-8.52%",
+            }}
           />
 
-          {/* ── Download APK button — covers left black box ────────────────
-              Image 612×408. Black boxes span roughly y=65%–77%, two side-by-side.
-              Left box:  x≈59.5%–75.3%  Right box: x≈77%–93%
-          ──────────────────────────────────────────────────────────────── */}
+          {/* ── Download button — left dark box ──────────────────────────── */}
           <a
             href={APP_DOWNLOAD_URL}
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
             style={{
-              ...btnBase,
-              left: "59.5%",
-              top: "65%",
-              width: "15.8%",
-              height: "12%",
+              position: "absolute",
+              left: "62.1%",
+              top: "73.7%",
+              width: "16.2%",
+              height: "13%",
               background: "linear-gradient(135deg, #e63946 0%, #c1121f 100%)",
+              border: "none",
+              borderRadius: "7px",
               color: "#fff",
-              fontSize: "clamp(5px, 1.3vw, 9px)",
+              fontWeight: 700,
+              fontSize: "clamp(6px, 1.5vw, 11px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8%",
+              cursor: "pointer",
+              textDecoration: "none",
+              boxSizing: "border-box",
+              transition: "filter 0.15s, transform 0.15s",
+              whiteSpace: "nowrap",
+              letterSpacing: "0.01em",
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.filter = "brightness(1.2)";
-              (e.currentTarget as HTMLElement).style.transform = "scale(1.04)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.filter = "brightness(1.2)";
+              el.style.transform = "scale(1.05)";
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.filter = "brightness(1)";
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.filter = "brightness(1)";
+              el.style.transform = "scale(1)";
             }}
           >
-            <Download size={10} style={{ flexShrink: 0 }} />
+            {/* Download icon */}
+            <svg viewBox="0 0 16 16" fill="currentColor" style={{ width: "22%", flexShrink: 0 }}>
+              <path d="M8 12l-4.5-4.5 1.06-1.06L7 9.38V2h2v7.38l2.44-2.94 1.06 1.06L8 12zM2 13h12v1.5H2z"/>
+            </svg>
             Download
           </a>
 
-          {/* ── Continue Online button — covers right black box ───────────── */}
+          {/* ── Continue Online button — right dark box ───────────────────── */}
           <button
             onClick={onClose}
             style={{
-              ...btnBase,
-              left: "77%",
-              top: "65%",
-              width: "15.8%",
-              height: "12%",
-              background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-              color: "rgba(255,255,255,0.85)",
-              fontSize: "clamp(5px, 1.3vw, 9px)",
-              border: "1px solid rgba(255,255,255,0.2)",
+              position: "absolute",
+              left: "80.3%",
+              top: "73.7%",
+              width: "16.2%",
+              height: "13%",
+              background: "rgba(20,20,40,0.9)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              borderRadius: "7px",
+              color: "rgba(255,255,255,0.9)",
+              fontWeight: 700,
+              fontSize: "clamp(5px, 1.4vw, 10px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6%",
+              cursor: "pointer",
+              boxSizing: "border-box",
+              transition: "filter 0.15s, transform 0.15s",
+              whiteSpace: "nowrap",
+              letterSpacing: "0.01em",
+              fontFamily: "inherit",
+              padding: 0,
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.filter = "brightness(1.4)";
-              (e.currentTarget as HTMLElement).style.transform = "scale(1.04)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.filter = "brightness(1.5)";
+              el.style.transform = "scale(1.05)";
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.filter = "brightness(1)";
-              (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+              const el = e.currentTarget as HTMLElement;
+              el.style.filter = "brightness(1)";
+              el.style.transform = "scale(1)";
             }}
           >
-            <Monitor size={10} style={{ flexShrink: 0 }} />
+            {/* Monitor icon */}
+            <svg viewBox="0 0 16 16" fill="currentColor" style={{ width: "22%", flexShrink: 0 }}>
+              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v9a1.5 1.5 0 0 1-1.5 1.5H9v1h1a.5.5 0 0 1 0 1H6a.5.5 0 0 1 0-1h1v-1H2.5A1.5 1.5 0 0 1 1 11.5zM2.5 2a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/>
+            </svg>
             Online
           </button>
-
-          {/* Bottom fade */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "18%",
-              background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 70%, rgba(0,0,0,0.95) 100%)",
-              pointerEvents: "none",
-            }}
-          />
         </div>
       </div>
 
