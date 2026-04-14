@@ -172,7 +172,7 @@ export default function Header() {
 
             <Link href="/downloads">
               <div
-                className="desktop-only download-app-button header-download-app-button"
+                className="download-app-button header-download-app-button header-shine-step-1"
               >
                 <span className="download-app-button-glow" />
                 <span className="download-app-button-shine" />
@@ -202,21 +202,19 @@ export default function Header() {
             </button>
 
             {/* VIP button */}
-            <button onClick={() => setShowVIP(true)}
-              style={{
-                display: "flex", alignItems: "center", gap: 4,
-                padding: "0 10px", height: 28, borderRadius: 14,
-                background: "linear-gradient(90deg, #f5c842 0%, #ffdd9a 45%, #e8a800 100%)",
-                color: "#3d2200", fontSize: 11, fontWeight: 700, border: "none", cursor: "pointer", flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(245,200,66,0.3)", transition: "filter 0.2s", letterSpacing: "0.02em", marginLeft: 6,
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.filter = "brightness(1.08)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.filter = "brightness(1)"; }}
+            <button
+              type="button"
+              onClick={() => setShowVIP(true)}
+              className="header-action-button header-vip-button header-shine-step-2"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <path d="M2 19h20M3 19L5 9l4.5 4L12 4l2.5 9L19 9l2 10" stroke="#3d2200" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="desktop-only" style={{ display: "inline" }}>JOIN </span>VIP
+              <span className="download-app-button-glow" />
+              <span className="download-app-button-shine" />
+              <span className="header-action-icon">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 19h20M3 19L5 9l4.5 4L12 4l2.5 9L19 9l2 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="header-action-label"><span className="desktop-only" style={{ display: "inline" }}>JOIN </span>VIP</span>
             </button>
 
             {/* Admin link */}
@@ -312,22 +310,20 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <button onClick={() => setShowAuth(true)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 5, padding: "0 10px", height: 28, borderRadius: 14,
-                  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%)",
-                  border: "none", color: "#fff", fontSize: 11, fontWeight: 800, cursor: "pointer",
-                  flexShrink: 0, letterSpacing: "0.06em", marginLeft: 5,
-                  boxShadow: "0 2px 10px rgba(168,85,247,0.35)",
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.filter = "brightness(1.15)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.filter = "brightness(1)"; }}
+              <button
+                type="button"
+                onClick={() => setShowAuth(true)}
+                className="header-action-button header-login-button header-shine-step-3"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                LOG IN
+                <span className="download-app-button-glow" />
+                <span className="download-app-button-shine" />
+                <span className="header-action-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </span>
+                <span className="header-action-label">LOG IN</span>
               </button>
             )}
           </>
