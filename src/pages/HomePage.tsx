@@ -182,8 +182,8 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="carousel-wrapper" style={{ display: "flex", gap: 8, padding: "10px 12px", boxSizing: "border-box" }}>
-          <div className="carousel-main-wrap" style={{ flex: "0 0 auto", position: "relative" }}>
-            <div className="carousel-mobile-full" style={{ width: "calc(56vw - 20px)", minWidth: 480, maxWidth: 760, position: "relative", overflow: "hidden", borderRadius: 6, background: "#1a1a1a" }}>
+          <div className="carousel-main-wrap" style={{ flex: 1, position: "relative", minWidth: 0 }}>
+            <div className="carousel-mobile-full" style={{ width: "100%", position: "relative", overflow: "hidden", borderRadius: 6, background: "#1a1a1a" }}>
               <div style={{ paddingTop: "56.25%" }} />
               <img
                 key={currentShow.id}
@@ -362,7 +362,7 @@ function SecondaryCarousel({ shows }: { shows: Show[] }) {
   const current = shows[Math.min(activeIdx, shows.length - 1)];
 
   return (
-    <div className="secondary-carousel" style={{ flex: 1, minWidth: 220, position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a" }}>
+    <div className="secondary-carousel" style={{ flex: 1, minWidth: 0, position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a" }}>
       <div style={{ paddingTop: "56.25%" }} />
       <img
         key={current.id}
