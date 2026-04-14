@@ -431,8 +431,8 @@ function SecondaryCarousel({ shows }: { shows: Show[] }) {
 }
 
 function ContentRow({ title, subtitle, shows, categoryHref }: { title: string; subtitle?: string; shows: Show[]; categoryHref?: string }) {
-  if (!shows.length) return null;
   const scrollRef = useRef<HTMLDivElement>(null);
+  if (!shows.length) return null;
   const scroll = (dir: "left" | "right") => {
     if (scrollRef.current) scrollRef.current.scrollBy({ left: dir === "right" ? 280 : -280, behavior: "smooth" });
   };
