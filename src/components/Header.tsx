@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { User, Clock, Bookmark, Download, LogOut } from "lucide-react";
+import { User, Clock, Bookmark, Download, LogOut, Smartphone } from "lucide-react";
 import VIPModal from "./VIPModal";
 import AuthModal from "./AuthModal";
 import { useAuth } from "../contexts/AuthContext";
@@ -172,27 +172,18 @@ export default function Header() {
 
             <Link href="/downloads">
               <div
-                className="desktop-only"
-                style={{
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  padding: "0 12px", height: 28, borderRadius: 14,
-                  background: "rgba(0,169,245,0.16)",
-                  border: "1px solid rgba(0,169,245,0.45)",
-                  color: "#8be1ff", fontSize: 11, fontWeight: 800,
-                  cursor: "pointer", flexShrink: 0, letterSpacing: "0.04em",
-                  marginLeft: 8,
-                  textTransform: "uppercase",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.26)";
-                  (e.currentTarget as HTMLElement).style.color = "#fff";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(0,169,245,0.16)";
-                  (e.currentTarget as HTMLElement).style.color = "#8be1ff";
-                }}
+                className="desktop-only download-app-button header-download-app-button"
               >
-                DOWNLOAD APP
+                <span className="download-app-button-glow" />
+                <span className="download-app-button-shine" />
+                <span className="download-app-button-icon header-download-app-button-icon">
+                  <Smartphone size={14} />
+                </span>
+                <span className="download-app-button-copy">
+                  <span className="download-app-button-title header-download-app-button-title">Download App</span>
+                  <span className="download-app-button-subtitle header-download-app-button-subtitle">Android & iOS</span>
+                </span>
+                <Download className="download-app-button-arrow header-download-app-button-arrow" size={14} />
               </div>
             </Link>
 
