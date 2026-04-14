@@ -24,13 +24,14 @@ The project runs through the Replit workflow using:
 pnpm run dev
 ```
 
-Vite is configured to bind to `0.0.0.0`, use the `PORT` environment variable when present, and allow proxied Replit preview hosts.
+Vite is configured to bind to `0.0.0.0`, use the `PORT` environment variable when present, and default to port `5000` for Replit preview compatibility. The workflow waits for port `5000` and uses a web preview output.
 
 ## Migration Status
 
 - Dependencies were installed from the existing `pnpm-lock.yaml` without rewriting the project.
-- The Replit workflow starts successfully on port 3000.
+- The Replit workflow starts successfully on port 5000.
 - The root page and SPA routes respond successfully in the Replit environment.
+- The public Replit development URL has been verified to load the LUOFILM home page.
 
 ## Original Deployment Notes
 
