@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
 
@@ -240,7 +240,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="carousel-side-panel" style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
+          <div className="carousel-side-panel" style={{ flex: "0 0 auto", width: 190, display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
             <div style={{ display: "flex", gap: 8, flex: "0 0 auto" }}>
               {sideShows.map((show) => <SideShowCard key={show.id} show={show} />)}
             </div>
@@ -248,6 +248,8 @@ export default function HomePage() {
               {miniShows.map((show) => <MiniShowCard key={show.id} show={show} />)}
             </div>
           </div>
+
+          <SecondaryCarousel shows={bannerShows} />
         </div>
       )}
 
@@ -329,6 +331,102 @@ function MiniShowCard({ show }: { show: Show }) {
         )}
       </div>
     </Link>
+  );
+}
+
+function SecondaryCarousel({ shows }: { shows: Show[] }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [fading, setFading] = useState(false);
+  const timer2 = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goNext = useCallback(() => {
+    setFading(true);
+    setTimeout(() => {
+      setActiveIdx(prev => (prev + 1) % Math.max(shows.length, 1));
+      setFading(false);
+    }, 300);
+  }, [shows.length]);
+
+  useEffect(() => {
+    if (shows.length === 0) return;
+    const init = setTimeout(() => {
+      timer2.current = setInterval(goNext, 5000);
+    }, 2500);
+    return () => {
+      clearTimeout(init);
+      if (timer2.current) clearInterval(timer2.current);
+    };
+  }, [goNext, shows.length]);
+
+  if (shows.length === 0) return null;
+  const current = shows[Math.min(activeIdx, shows.length - 1)];
+
+  return (
+    <div className="secondary-carousel" style={{ flex: 1, minWidth: 220, position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a" }}>
+      <div style={{ paddingTop: "56.25%" }} />
+      <img
+        key={current.id}
+        src={current.thumbnailUrl}
+        alt={current.title}
+        style={{
+          position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
+          opacity: fading ? 0.5 : 1, transition: "opacity 0.3s ease",
+        }}
+      />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%)" }} />
+
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 16px 14px" }}>
+        {current.badge && current.badge !== "none" && (
+          <span style={{
+            display: "inline-block", padding: "1px 7px", borderRadius: 2, fontSize: 10, fontWeight: 700, marginBottom: 6,
+            background: current.badge === "VIP" ? "linear-gradient(90deg,#ffc552,#ffdd9a)" : current.badge === "Express" ? "linear-gradient(90deg,#00a3f5,#00c9fd)" : "linear-gradient(90deg,#8819ff,#ad61ff)",
+            color: current.badge === "VIP" ? "#4e2d03" : "#fff",
+          }}>{current.badge}</span>
+        )}
+        <h3 style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, marginBottom: 4, textShadow: "0 1px 4px rgba(0,0,0,0.8)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" as any }}>
+          {current.title}
+        </h3>
+        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as any, overflow: "hidden", marginBottom: 10, maxWidth: 280 }}>
+          {current.description}
+        </p>
+        <div style={{ display: "flex", gap: 6 }}>
+          <Link href={`/play/${current.id}`}>
+            <button style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 16px", borderRadius: 20, background: "#00a9f5", color: "#fff", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
+              <Play size={11} fill="#fff" /> PLAY
+            </button>
+          </Link>
+          <Link href={`/play/${current.id}`}>
+            <button style={{ padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 500, border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }}>
+              DETAILS
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <button
+        onClick={() => { setActiveIdx(prev => (prev - 1 + shows.length) % shows.length); if (timer2.current) { clearInterval(timer2.current); timer2.current = setInterval(goNext, 5000); } }}
+        style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+      >
+        <ChevronLeft size={14} />
+      </button>
+      <button
+        onClick={() => { goNext(); if (timer2.current) { clearInterval(timer2.current); timer2.current = setInterval(goNext, 5000); } }}
+        style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 28, height: 28, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+      >
+        <ChevronRight size={14} />
+      </button>
+
+      <div style={{ position: "absolute", bottom: 10, right: 12, display: "flex", gap: 3 }}>
+        {shows.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveIdx(i)}
+            style={{ height: 3, width: i === activeIdx ? 16 : 5, borderRadius: 2, background: i === activeIdx ? "#fff" : "rgba(255,255,255,0.35)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s" }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
