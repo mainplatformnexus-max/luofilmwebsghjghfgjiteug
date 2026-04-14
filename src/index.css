@@ -413,6 +413,156 @@ input, button, select, textarea {
   font-family: Georgia, 'Times New Roman', serif;
 }
 
+.download-app-button {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 248px;
+  padding: 12px 18px 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255,255,255,0.38), transparent 22%),
+    linear-gradient(110deg, #00d8ff 0%, #00a9f5 36%, #0066ff 72%, #7c3cff 100%);
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow:
+    0 16px 42px rgba(0, 116, 255, 0.34),
+    0 4px 16px rgba(0, 169, 245, 0.24),
+    inset 0 1px 0 rgba(255,255,255,0.34);
+  cursor: pointer;
+  transform: translateZ(0);
+  animation: download-button-float 3s ease-in-out infinite;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.download-app-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: saturate(1.12);
+  box-shadow:
+    0 22px 52px rgba(0, 116, 255, 0.42),
+    0 8px 24px rgba(0, 216, 255, 0.32),
+    inset 0 1px 0 rgba(255,255,255,0.38);
+}
+
+.download-app-button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.download-app-button-glow {
+  position: absolute;
+  inset: -80% -30%;
+  z-index: 0;
+  background: conic-gradient(from 90deg, transparent, rgba(255,255,255,0.32), transparent, rgba(0,216,255,0.34), transparent);
+  opacity: 0.34;
+  animation: download-button-spin 5.5s linear infinite;
+  pointer-events: none;
+}
+
+.download-app-button-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(115deg, transparent 0%, transparent 30%, rgba(255,255,255,0.62) 45%, rgba(255,255,255,0.18) 52%, transparent 66%, transparent 100%);
+  transform: translateX(-135%) skewX(-18deg);
+  animation: download-button-shine 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.download-app-button-icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 18px rgba(0,0,0,0.16);
+  animation: download-button-icon-pop 1.8s ease-in-out infinite;
+}
+
+.download-app-button-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.download-app-button-title {
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: 0.01em;
+}
+
+.download-app-button-subtitle {
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.download-app-button-arrow {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  opacity: 0.88;
+  animation: download-button-arrow 1.35s ease-in-out infinite;
+}
+
+@keyframes download-button-shine {
+  0% {
+    transform: translateX(-135%) skewX(-18deg);
+  }
+  42%, 100% {
+    transform: translateX(145%) skewX(-18deg);
+  }
+}
+
+@keyframes download-button-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes download-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes download-button-icon-pop {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes download-button-arrow {
+  0%, 100% {
+    transform: translateY(-1px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;

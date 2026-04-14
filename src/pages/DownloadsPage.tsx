@@ -33,22 +33,23 @@ export default function DownloadsPage() {
           ))}
         </div>
 
-        {/* Download button */}
         <a
           href="https://play.google.com/store"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ textDecoration: "none" }}
+          className="download-app-button"
+          aria-label="Download the LUO FILM app"
         >
-          <button style={{
-            display: "inline-flex", alignItems: "center", gap: 10, padding: "14px 32px",
-            borderRadius: 30, background: "linear-gradient(90deg,#00a9f5,#0077cc)",
-            border: "none", color: "#fff", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            boxShadow: "0 4px 20px rgba(0,169,245,0.3)", marginBottom: 14,
-          }}>
-            <Smartphone size={18} />
-            Download the App
-          </button>
+          <span className="download-app-button-glow" />
+          <span className="download-app-button-shine" />
+          <span className="download-app-button-icon">
+            <Smartphone size={19} />
+          </span>
+          <span className="download-app-button-copy">
+            <span className="download-app-button-title">Download the App</span>
+            <span className="download-app-button-subtitle">Android & iOS ready</span>
+          </span>
+          <Download className="download-app-button-arrow" size={18} />
         </a>
 
         <div>
