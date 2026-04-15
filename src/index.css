@@ -734,29 +734,24 @@ input, button, select, textarea {
   .header-download-app-button {
     display: inline-flex !important;
     flex-shrink: 0 !important;
-    min-width: 0 !important;
-    width: 31px !important;
+    min-width: 88px !important;
     height: 31px !important;
-    padding: 0 !important;
-    gap: 0 !important;
+    padding: 3px 8px 3px 4px !important;
+    gap: 4px !important;
     margin-left: 4px !important;
-    border-radius: 50% !important;
-    justify-content: center !important;
-    align-items: center !important;
   }
 
   .header-download-app-button-icon {
-    width: 20px !important;
-    height: 20px !important;
-    flex-basis: 20px !important;
+    width: 22px !important;
+    height: 22px !important;
+    flex-basis: 22px !important;
     flex-shrink: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    margin: 0 !important;
   }
 
   .header-download-app-button-title {
-    display: none !important;
+    display: block !important;
+    font-size: 8px !important;
+    letter-spacing: 0.02em !important;
   }
 
   .header-download-app-button-subtitle {
@@ -768,7 +763,7 @@ input, button, select, textarea {
   }
 
   .header-download-app-button .download-app-button-copy {
-    display: none !important;
+    display: flex !important;
   }
 
   .header-action-button {
