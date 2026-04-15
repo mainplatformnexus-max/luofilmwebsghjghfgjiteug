@@ -56,7 +56,7 @@ export default function TermsPage() {
           },
           {
             title: "13. Contact Us",
-            body: `If you have any questions about these Terms of Service, please contact us at: support@luofilm.site`,
+            body: `If you have any questions about these Terms of Service, please contact us at: mainplatform.nexus@gmail.com or via WhatsApp: +256 760 734 679`,
           },
         ].map(({ title, body }) => (
           <div key={title} style={{ marginBottom: 28 }}>

@@ -16,7 +16,7 @@ export default function DmcaPage() {
           },
           {
             title: "DMCA Agent Contact",
-            body: `Send DMCA notices to our designated agent at: dmca@luofilm.site. Please include "DMCA Notice" in the subject line. We will review and respond to valid DMCA notices within 3–5 business days.`,
+            body: `Send DMCA notices to our designated agent at: mainplatform.nexus@gmail.com. Please include "DMCA Notice" in the subject line. You may also reach us via WhatsApp: +256 760 734 679. We will review and respond to valid DMCA notices within 3–5 business days.`,
           },
           {
             title: "Counter-Notification",

@@ -40,7 +40,7 @@ export default function PrivacyPage() {
           },
           {
             title: "9. Your Rights",
-            body: `Depending on your location, you may have rights regarding your personal data, including: the right to access your data; the right to correct inaccurate data; the right to request deletion; the right to object to processing; the right to data portability. To exercise these rights, please contact us at support@luofilm.site.`,
+            body: `Depending on your location, you may have rights regarding your personal data, including: the right to access your data; the right to correct inaccurate data; the right to request deletion; the right to object to processing; the right to data portability. To exercise these rights, please contact us at mainplatform.nexus@gmail.com or via WhatsApp: +256 760 734 679.`,
           },
           {
             title: "10. International Transfers",
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
           },
           {
             title: "12. Contact Us",
-            body: `If you have any questions about this Privacy Policy, please contact our Data Protection team at: privacy@luofilm.site`,
+            body: `If you have any questions about this Privacy Policy, please contact our Data Protection team at: mainplatform.nexus@gmail.com or via WhatsApp: +256 760 734 679`,
           },
         ].map(({ title, body }) => (
           <div key={title} style={{ marginBottom: 28 }}>

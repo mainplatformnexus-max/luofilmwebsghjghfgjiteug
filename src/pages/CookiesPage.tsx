@@ -36,7 +36,7 @@ export default function CookiesPage() {
           },
           {
             title: "Contact Us",
-            body: `If you have questions about our use of cookies, please contact us at: support@luofilm.site`,
+            body: `If you have questions about our use of cookies, please contact us at: mainplatform.nexus@gmail.com or via WhatsApp: +256 760 734 679`,
           },
         ].map(({ title, body }) => (
           <div key={title} style={{ marginBottom: 28 }}>

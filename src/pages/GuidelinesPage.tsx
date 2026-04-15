@@ -28,7 +28,7 @@ export default function GuidelinesPage() {
           },
           {
             title: "Reporting Violations",
-            body: `If you encounter content that you believe violates these guidelines, please report it immediately by contacting us at content@luofilm.site. Include the content title, URL, and a description of the violation. We will review all reports within 72 hours.`,
+            body: `If you encounter content that you believe violates these guidelines, please report it immediately by contacting us at mainplatform.nexus@gmail.com or via WhatsApp: +256 760 734 679. Include the content title, URL, and a description of the violation. We will review all reports within 72 hours.`,
           },
           {
             title: "Enforcement",
