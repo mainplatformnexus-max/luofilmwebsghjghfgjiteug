@@ -1,6 +1,7 @@
 import { Switch, Route, useLocation } from "wouter";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import MobileBottomNav from "./components/MobileBottomNav";
 import HomePage from "./pages/HomePage";
 import PlayPage from "./pages/PlayPage";
@@ -10,9 +11,18 @@ import ProfilePage from "./pages/ProfilePage";
 import HistoryPage from "./pages/HistoryPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import DownloadsPage from "./pages/DownloadsPage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import CookiesPage from "./pages/CookiesPage";
+import DmcaPage from "./pages/DmcaPage";
+import GuidelinesPage from "./pages/GuidelinesPage";
+import ContactPage from "./pages/ContactPage";
 import AdminApp from "./admin/AdminApp";
 
 function MainSite() {
+  const [location] = useLocation();
+  const hideFooter = location.startsWith("/play/");
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] mobile-pb">
       <Header />
@@ -25,6 +35,12 @@ function MainSite() {
         <Route path="/watchlist" component={WatchlistPage} />
         <Route path="/downloads" component={DownloadsPage} />
         <Route path="/play/:id" component={PlayPage} />
+        <Route path="/terms" component={TermsPage} />
+        <Route path="/privacy" component={PrivacyPage} />
+        <Route path="/cookies" component={CookiesPage} />
+        <Route path="/dmca" component={DmcaPage} />
+        <Route path="/guidelines" component={GuidelinesPage} />
+        <Route path="/contact" component={ContactPage} />
         <Route path="/drama">
           <CategoryPage
             genre="drama"
@@ -76,6 +92,7 @@ function MainSite() {
           </div>
         </Route>
       </Switch>
+      {!hideFooter && <Footer />}
     </div>
   );
 }
