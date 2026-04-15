@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Star } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
+import { useSEO } from "../hooks/useSEO";
 
 interface CategoryPageProps {
   genre: string;
@@ -94,6 +95,29 @@ export default function CategoryPage({ genre, title, description: _description }
   const accentColor = GENRE_COLORS[genre] || "#00a9f5";
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const seoDescriptions: Record<string, string> = {
+    drama: "Watch Luo translated drama series — romance, modern, campus and historical dramas, all translated by VJ Paul UG on LUOFILM.SITE.",
+    movie: "Stream and download Luo translated movies — action, romance, thriller and more, all translated by VJ Paul UG on LUOFILM.SITE.",
+    anime: "Watch Luo translated anime — fantasy, xianxia, and animated series translated by VJ Paul UG on LUOFILM.SITE.",
+    variety: "Watch Luo translated variety and comedy shows on LUOFILM.SITE, translated by VJ Paul UG.",
+    sports: "Watch Luo translated sports and action content on LUOFILM.SITE, translated by VJ Paul UG.",
+    documentary: "Watch Luo translated documentaries and historical shows on LUOFILM.SITE, translated by VJ Paul UG.",
+  };
+  const seoKeywords: Record<string, string> = {
+    drama: "luo translated drama, luo drama series, vj paul drama, luo romance drama, luo korean drama, luo chinese drama",
+    movie: "luo translated movies, luo movies download, vj paul movies, luo film, luofilm movies, luo movies 2024 2025",
+    anime: "luo translated anime, luo anime series, vj paul anime, luo fantasy anime",
+    variety: "luo variety shows, luo comedy shows, vj paul variety, luo translated variety",
+    sports: "luo sports, luo action, vj paul sports, luo translated action",
+    documentary: "luo documentary, luo historical, vj paul documentary, luo translated documentary",
+  };
+  useSEO({
+    title: `Luo Translated ${title} — VJ Paul UG`,
+    description: seoDescriptions[genre] || `Watch Luo translated ${title} on LUOFILM.SITE, translated by VJ Paul UG.`,
+    keywords: seoKeywords[genre] || `luo translated ${genre}, vj paul, luofilm`,
+    url: `/${genre === "movie" ? "movie" : genre}`,
+  });
 
   useEffect(() => {
     const cu = auth.currentUser;

@@ -1,4 +1,7 @@
+import { useSEO } from "../hooks/useSEO";
+
 export default function DmcaPage() {
+  useSEO({ title: "DMCA & Copyright Policy", description: "LUOFILM.SITE DMCA and Copyright Policy. Report copyright infringement on our Luo translated movies platform.", url: "/dmca" });
   return (
     <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff", padding: "30px 20px 60px" }}>
       <div style={{ maxWidth: 820, margin: "0 auto" }}>

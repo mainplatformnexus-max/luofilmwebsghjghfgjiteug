@@ -1,4 +1,7 @@
+import { useSEO } from "../hooks/useSEO";
+
 export default function GuidelinesPage() {
+  useSEO({ title: "Content Guidelines", description: "LUOFILM.SITE Content Guidelines — community standards for our Luo translated movies and drama streaming platform.", url: "/guidelines" });
   return (
     <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff", padding: "30px 20px 60px" }}>
       <div style={{ maxWidth: 820, margin: "0 auto" }}>

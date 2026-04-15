@@ -1,4 +1,7 @@
+import { useSEO } from "../hooks/useSEO";
+
 export default function CookiesPage() {
+  useSEO({ title: "Cookie Policy", description: "Learn how LUOFILM.SITE uses cookies on our Luo translated movies and drama streaming platform.", url: "/cookies" });
   return (
     <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff", padding: "30px 20px 60px" }}>
       <div style={{ maxWidth: 820, margin: "0 auto" }}>

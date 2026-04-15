@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
+import { useSEO } from "../hooks/useSEO";
 
 interface Show {
   id: string;
@@ -74,6 +75,12 @@ function carouselToShow(item: CarouselItem, contentMap: Map<string, Show>): Show
 }
 
 export default function HomePage() {
+  useSEO({
+    title: "Luo Translated Movies & Drama — VJ Paul UG | Free Stream & Download",
+    description: "LUOFILM.SITE — Stream and download Luo translated movies, drama, series and anime translated by VJ Paul UG. Free online Luo movies, Luo drama, Luo translated content worldwide.",
+    keywords: "luo translated movies, luo movies, luofilm, luo film, vj paul ug, luo translated drama, luo series, luo translated anime, luo translated korean drama, luo translated chinese drama, luofilm.site, download luo movies, stream luo movies, free luo movies",
+    url: "/",
+  });
   const [shows, setShows] = useState<Show[]>([]);
   const [bannerShows, setBannerShows] = useState<Show[]>([]);
   const [secondaryShows, setSecondaryShows] = useState<Show[]>([]);
