@@ -104,31 +104,29 @@ export default function HomePage() {
 
         const contentMap = new Map<string, Show>(allShows.map(s => [s.id, s]));
 
-        // Main left carousel (page === "home")
-        const homeCarousel = (carouselItems as CarouselItem[])
-          .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
-        const banners: Show[] = [];
-        for (const item of homeCarousel) {
-          const s = carouselToShow(item, contentMap);
-          if (s) banners.push(s);
-        }
-        if (banners.length > 0) {
-          setBannerShows(banners);
-        } else if (allShows.length > 0) {
-          setBannerShows(allShows.slice(0, 6));
+        // First hero carousel — always shows movies/all content from the database
+        if (allShows.length > 0) {
+          const movies = allShows.filter(s => s.type === "movie");
+          setBannerShows(movies.length > 0 ? movies.slice(0, 8) : allShows.slice(0, 8));
         }
 
-        // Right secondary carousel (page === "carousel2")
+        // Right secondary carousel — shows what admin uploaded in carousel manager
+        // Uses "Left Carousel" items (page="home") first, then "Right Carousel" (page="carousel2")
+        const adminCarousel = (carouselItems as CarouselItem[])
+          .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
         const secondary: Show[] = [];
-        for (const item of secondaryItems as CarouselItem[]) {
+        for (const item of adminCarousel) {
           const s = carouselToShow(item, contentMap);
           if (s) secondary.push(s);
         }
-        if (secondary.length > 0) {
-          setSecondaryShows(secondary);
-        } else if (allShows.length > 0) {
-          setSecondaryShows(allShows.slice(0, 6));
+        // Fall back to carousel2 if Left Carousel is empty
+        if (secondary.length === 0) {
+          for (const item of secondaryItems as CarouselItem[]) {
+            const s = carouselToShow(item, contentMap);
+            if (s) secondary.push(s);
+          }
         }
+        setSecondaryShows(secondary);
 
         // Middle featured panel (page === "home" in featured collection)
         const featured: Show[] = [];
