@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useEffect } from "react";
 
 const FacebookIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -38,6 +39,16 @@ const TelegramIcon = () => (
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://images.dmca.com/Badges/DMCABadgeHelper.min.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <footer style={{
@@ -194,7 +205,7 @@ export default function Footer() {
               All content, trademarks, and media are the property of their respective owners. LUOFILM.SITE is a streaming platform and does not claim ownership of third-party content. Unauthorized reproduction or distribution is strictly prohibited.
             </p>
           </div>
-          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             {[
               { label: "Terms", href: "/terms" },
               { label: "Privacy", href: "/privacy" },
@@ -208,6 +219,20 @@ export default function Footer() {
                 >{label}</span>
               </Link>
             ))}
+            <a
+              href="//www.dmca.com/Protection/Status.aspx?ID=88b14385-d10d-46b3-9185-6dda694e3541"
+              title="DMCA.com Protection Status"
+              className="dmca-badge"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "inline-flex", alignItems: "center" }}
+            >
+              <img
+                src="https://images.dmca.com/Badges/DMCA_logo-grn-btn100w.png?ID=88b14385-d10d-46b3-9185-6dda694e3541"
+                alt="DMCA.com Protection Status"
+                style={{ height: 28, width: "auto", display: "block" }}
+              />
+            </a>
           </div>
         </div>
       </div>
