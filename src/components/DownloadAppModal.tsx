@@ -1,17 +1,6 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 
-// New image: 626×417, transparent only on left (44px). Content area: 564×417.
-// scale = 626/564 = 1.110  → img width = 111%
-// left offset = -(44/564)*100 = -7.80%
-// top offset = 0 (no top transparent strip)
-//
-// Two STACKED dark buttons (visual estimate, content-space %):
-//   Button 1 (Download):       left≈76%  top≈71%  w≈21%  h≈10%
-//   Button 2 (Continue Online): left≈76%  top≈83%  w≈21%  h≈10%
-
-const APP_DOWNLOAD_URL = "https://luofilm.site/download";
-
 interface Props {
   onClose: () => void;
 }
@@ -52,7 +41,6 @@ export default function DownloadAppModal({ onClose }: Props) {
           overflow: "hidden",
           boxShadow: "0 32px 80px rgba(0,0,0,0.8), 0 8px 28px rgba(0,0,0,0.55)",
           animation: "dlFloatIn 0.36s cubic-bezier(0.34,1.35,0.64,1)",
-          background: "#fff",
           lineHeight: 0,
         }}
       >
@@ -68,9 +56,9 @@ export default function DownloadAppModal({ onClose }: Props) {
             width: 28,
             height: 28,
             borderRadius: "50%",
-            background: "rgba(0,0,0,0.18)",
-            border: "1px solid rgba(0,0,0,0.15)",
-            color: "#222",
+            background: "rgba(0,0,0,0.45)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            color: "#fff",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -78,126 +66,23 @@ export default function DownloadAppModal({ onClose }: Props) {
             transition: "background 0.15s",
             padding: 0,
           }}
-          onMouseEnter={e => (e.currentTarget.style.background = "rgba(210,25,25,0.85)")}
-          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.18)")}
+          onMouseEnter={e => (e.currentTarget.style.background = "rgba(210,25,25,0.9)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.45)")}
         >
-          <X size={13} style={{ pointerEvents: "none", color: "#fff" }} />
+          <X size={13} style={{ pointerEvents: "none" }} />
         </button>
 
-        {/* ── Image crop container ─────────────────────────────────────────
-            Aspect ratio = content W / content H = 564 / 417
-            Image scaled to 111% width and shifted -7.8% left to clip
-            the 44 px transparent left margin.
-        ──────────────────────────────────────────────────────────────────── */}
-        <div
+        {/* Image fills the card exactly */}
+        <img
+          src="/download-app-banner.png"
+          alt="Download LUOFILM App"
+          draggable={false}
           style={{
-            position: "relative",
             width: "100%",
-            aspectRatio: "564 / 417",
-            overflow: "hidden",
+            height: "auto",
+            display: "block",
           }}
-        >
-          <img
-            src="/download-app-banner.png"
-            alt="Download LUOFILM App"
-            draggable={false}
-            style={{
-              position: "absolute",
-              width: "111%",
-              left: "-7.8%",
-              top: "0%",
-            }}
-          />
-
-          {/* ── Download button — top dark box ────────────────────────────── */}
-          <a
-            href={APP_DOWNLOAD_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
-            style={{
-              position: "absolute",
-              left: "76%",
-              top: "71%",
-              width: "21%",
-              height: "10%",
-              background: "#1a1a2e",
-              border: "none",
-              borderRadius: "8px",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "clamp(6px, 1.4vw, 10px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8%",
-              cursor: "pointer",
-              textDecoration: "none",
-              boxSizing: "border-box",
-              transition: "filter 0.15s, transform 0.15s",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.filter = "brightness(1.6)";
-              el.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.filter = "brightness(1)";
-              el.style.transform = "scale(1)";
-            }}
-          >
-            <svg viewBox="0 0 16 16" fill="currentColor" style={{ width: "20%", flexShrink: 0 }}>
-              <path d="M8 12l-4.5-4.5 1.06-1.06L7 9.38V2h2v7.38l2.44-2.94 1.06 1.06L8 12zM2 13h12v1.5H2z"/>
-            </svg>
-            Download
-          </a>
-
-          {/* ── Continue Online button — bottom dark box ──────────────────── */}
-          <button
-            onClick={onClose}
-            style={{
-              position: "absolute",
-              left: "76%",
-              top: "83%",
-              width: "21%",
-              height: "10%",
-              background: "#1a1a2e",
-              border: "none",
-              borderRadius: "8px",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "clamp(6px, 1.4vw, 10px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8%",
-              cursor: "pointer",
-              boxSizing: "border-box",
-              transition: "filter 0.15s, transform 0.15s",
-              whiteSpace: "nowrap",
-              fontFamily: "inherit",
-              padding: 0,
-            }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.filter = "brightness(1.6)";
-              el.style.transform = "scale(1.05)";
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.filter = "brightness(1)";
-              el.style.transform = "scale(1)";
-            }}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: "20%", flexShrink: 0 }}>
-              <rect x="2" y="3" width="20" height="14" rx="2"/>
-              <path d="M8 21h8M12 17v4"/>
-            </svg>
-            Online
-          </button>
-        </div>
+        />
       </div>
 
       <style>{`
