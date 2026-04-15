@@ -72,17 +72,20 @@ export default function DownloadAppModal({ onClose }: Props) {
           <X size={13} style={{ pointerEvents: "none" }} />
         </button>
 
-        {/* Image fills the card exactly */}
-        <img
-          src="/download-app-banner.png"
-          alt="Download LUOFILM App"
-          draggable={false}
-          style={{
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
+        {/* Clicking the image downloads the APK */}
+        <a
+          href="https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk"
+          download="luofilm.apk"
+          onClick={e => e.stopPropagation()}
+          style={{ display: "block", lineHeight: 0, cursor: "pointer" }}
+        >
+          <img
+            src="/download-app-banner.png"
+            alt="Download LUOFILM App"
+            draggable={false}
+            style={{ width: "100%", height: "auto", display: "block" }}
+          />
+        </a>
       </div>
 
       <style>{`

@@ -177,10 +177,11 @@ export default function Header() {
               )}
             </div>
 
-            <div
+            <a
+              href="https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk"
+              download="luofilm.apk"
               className="download-app-button header-download-app-button header-shine-step-1"
-              onClick={() => setShowDownloadModal(true)}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", textDecoration: "none" }}
             >
               <span className="download-app-button-glow" />
               <span className="download-app-button-shine" />
@@ -192,7 +193,7 @@ export default function Header() {
                 <span className="download-app-button-subtitle header-download-app-button-subtitle">Android & iOS</span>
               </span>
               <Download className="download-app-button-arrow header-download-app-button-arrow" size={14} />
-            </div>
+            </a>
 
             {/* Mobile search icon */}
             <button
