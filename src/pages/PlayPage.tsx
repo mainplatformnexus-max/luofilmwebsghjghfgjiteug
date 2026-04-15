@@ -631,7 +631,7 @@ export default function PlayPage() {
                   }}
                   onClick={handleShare}
                 />
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative", userSelect: "none", WebkitUserSelect: "none" }}>
                   <ActionBtn
                     icon={isSubscribed ? <Download size={14} color={downloaded ? "#fff" : "#fb923c"} /> : <Lock size={14} color="#fb923c" />}
                     label={downloaded ? `${downloadQuality}` : "DOWNLOAD"}
@@ -660,6 +660,7 @@ export default function PlayPage() {
                           borderRadius: 10, padding: "8px 6px",
                           boxShadow: "0 8px 30px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,146,60,0.1)",
                           minWidth: 160, animation: "qualityPop 0.15s ease",
+                          userSelect: "none", WebkitUserSelect: "none",
                         }}>
                           <style>{`@keyframes qualityPop { from { opacity:0; transform:translateX(-50%) translateY(6px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`}</style>
                           <div style={{ fontSize: 11, color: "rgba(251,146,60,0.8)", textAlign: "center", paddingBottom: 6, borderBottom: "1px solid rgba(255,255,255,0.06)", marginBottom: 4, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
@@ -674,6 +675,7 @@ export default function PlayPage() {
                                 width: "100%", padding: "8px 12px", borderRadius: 6,
                                 background: "transparent", border: "none", cursor: downloading ? "not-allowed" : "pointer",
                                 transition: "background 0.15s", gap: 12, opacity: downloading ? 0.5 : 1,
+                                userSelect: "none", WebkitUserSelect: "none",
                               }}
                               onMouseEnter={e => (e.currentTarget.style.background = "rgba(251,146,60,0.12)")}
                               onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
