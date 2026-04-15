@@ -1,5 +1,8 @@
-import { Link } from "wouter";
-import { useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import VIPModal from "./VIPModal";
+import AuthModal from "./AuthModal";
 
 const YoutubeIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -33,6 +36,22 @@ const ThreadsIcon = () => (
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [showVIP, setShowVIP] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
+
+  function handleAccountLink(href: string, requiresVIP = false) {
+    if (requiresVIP) {
+      setShowVIP(true);
+      return;
+    }
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+    navigate(href);
+  }
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -45,6 +64,7 @@ export default function Footer() {
   }, []);
 
   return (
+    <>
     <footer style={{
       background: "#080808",
       borderTop: "1px solid rgba(255,255,255,0.07)",
@@ -135,19 +155,19 @@ export default function Footer() {
             <h4 style={{ color: "#fff", fontWeight: 700, fontSize: 13, marginBottom: 14, textTransform: "uppercase", letterSpacing: 0.5 }}>Account</h4>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9 }}>
               {[
-                { label: "My Profile", href: "/profile" },
-                { label: "Watch History", href: "/history" },
-                { label: "My Watchlist", href: "/watchlist" },
-                { label: "Downloads", href: "/downloads" },
-                { label: "Join VIP", href: "/profile" },
-              ].map(({ label, href }) => (
+                { label: "My Profile", href: "/profile", vip: false },
+                { label: "Watch History", href: "/history", vip: false },
+                { label: "My Watchlist", href: "/watchlist", vip: false },
+                { label: "Downloads", href: "/downloads", vip: false },
+                { label: "Join VIP", href: "/profile", vip: true },
+              ].map(({ label, href, vip }) => (
                 <li key={label}>
-                  <Link href={href}>
-                    <span style={{ color: "rgba(255,255,255,0.55)", textDecoration: "none", cursor: "pointer", transition: "color 0.2s" }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#cc00cc"}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"}
-                    >{label}</span>
-                  </Link>
+                  <span
+                    onClick={() => handleAccountLink(href, vip)}
+                    style={{ color: vip ? "#ffc552" : "rgba(255,255,255,0.55)", textDecoration: "none", cursor: "pointer", transition: "color 0.2s", fontWeight: vip ? 700 : 400 }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = vip ? "#ffdd9a" : "#cc00cc"}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = vip ? "#ffc552" : "rgba(255,255,255,0.55)"}
+                  >{label}</span>
                 </li>
               ))}
             </ul>
@@ -240,5 +260,9 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+
+    {showVIP && <VIPModal onClose={() => setShowVIP(false)} onOpenAuth={() => { setShowVIP(false); setShowAuth(true); }} />}
+    {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+  </>
   );
 }
