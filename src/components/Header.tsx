@@ -29,14 +29,8 @@ export default function Header() {
   const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   useEffect(() => {
-    const seen = sessionStorage.getItem("lf_dl_modal_shown");
-    if (!seen) {
-      const t = setTimeout(() => {
-        setShowDownloadModal(true);
-        sessionStorage.setItem("lf_dl_modal_shown", "1");
-      }, 2000);
-      return () => clearTimeout(t);
-    }
+    const t = setTimeout(() => setShowDownloadModal(true), 1000);
+    return () => clearTimeout(t);
   }, []);
 
   const { user, profile, logout } = useAuth();
