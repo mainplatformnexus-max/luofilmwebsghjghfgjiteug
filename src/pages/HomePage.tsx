@@ -396,33 +396,6 @@ function SecondaryCarousel({ shows }: { shows: Show[] }) {
         }}
       />
 
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 16px 14px" }}>
-        {current.badge && current.badge !== "none" && (
-          <span style={{
-            display: "inline-block", padding: "1px 7px", borderRadius: 2, fontSize: 10, fontWeight: 700, marginBottom: 6,
-            background: current.badge === "VIP" ? "linear-gradient(90deg,#ffc552,#ffdd9a)" : current.badge === "Express" ? "linear-gradient(90deg,#00a3f5,#00c9fd)" : "linear-gradient(90deg,#8819ff,#ad61ff)",
-            color: current.badge === "VIP" ? "#4e2d03" : "#fff",
-          }}>{current.badge}</span>
-        )}
-        <h3 style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, marginBottom: 4, textShadow: "0 1px 4px rgba(0,0,0,0.8)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" as any }}>
-          {current.title}
-        </h3>
-        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.6)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as any, overflow: "hidden", marginBottom: 10, maxWidth: 280 }}>
-          {current.description}
-        </p>
-        <div style={{ display: "flex", gap: 6 }}>
-          <Link href={`/play/${current.id}`}>
-            <button style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 16px", borderRadius: 20, background: "#00a9f5", color: "#fff", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer" }}>
-              <Play size={11} fill="#fff" /> PLAY
-            </button>
-          </Link>
-          <Link href={`/play/${current.id}`}>
-            <button style={{ padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 500, border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }}>
-              DETAILS
-            </button>
-          </Link>
-        </div>
-      </div>
 
       <button
         onClick={() => { setActiveIdx(prev => (prev - 1 + shows.length) % shows.length); if (timer2.current) { clearInterval(timer2.current); timer2.current = setInterval(goNext, 5000); } }}
