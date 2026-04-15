@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Shield, Globe, Database, Bell, Loader } from "lucide-react";
+import { Save, Shield, Globe, Database, Bell, Loader, ImageIcon } from "lucide-react";
 import { api } from "./api";
 import { auth } from "../lib/firebase";
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
@@ -27,6 +27,8 @@ const DEFAULT_SETTINGS = {
   watermarkEnabled: true,
   analyticsEnabled: true,
   twoFactor: false,
+  floatBannerUrl: "",
+  floatBannerLink: "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk",
 };
 
 const inp: React.CSSProperties = {
@@ -239,6 +241,43 @@ export default function Settings() {
           <Toggle checked={settings.watermarkEnabled} onChange={(v: boolean) => set("watermarkEnabled", v)} label="Enable Watermark" hint="Show platform watermark on videos" />
           <Toggle checked={settings.analyticsEnabled} onChange={(v: boolean) => set("analyticsEnabled", v)} label="Track Analytics" hint="Track and record user activity" />
         </div>
+      </Section>
+
+      <Section title="Float Banner (Welcome Modal)" icon={ImageIcon}>
+        <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(99,102,241,0.08)", borderRadius: 8, border: "1px solid rgba(99,102,241,0.25)" }}>
+          <span style={{ fontSize: 12, color: "#818cf8" }}>
+            The banner image shown automatically when visitors land on the site. Paste an image URL below — leave blank to use the default local image.
+          </span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+          <Field label="Banner Image URL" hint="Direct image URL (JPG, PNG, AVIF, WebP)">
+            <input
+              style={inp}
+              value={(settings as any).floatBannerUrl || ""}
+              onChange={e => set("floatBannerUrl", e.target.value)}
+              placeholder="https://example.com/my-banner.png"
+            />
+          </Field>
+          <Field label="Click Destination URL" hint="Where to send users when they click the banner">
+            <input
+              style={inp}
+              value={(settings as any).floatBannerLink || ""}
+              onChange={e => set("floatBannerLink", e.target.value)}
+              placeholder="https://pub-xxx.r2.dev/luofilm.apk"
+            />
+          </Field>
+        </div>
+        {(settings as any).floatBannerUrl && (
+          <div style={{ marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 8 }}>Preview:</div>
+            <img
+              src={(settings as any).floatBannerUrl}
+              alt="Banner preview"
+              onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              style={{ maxWidth: 320, borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", display: "block" }}
+            />
+          </div>
+        )}
       </Section>
 
       <Section title="Security" icon={Shield}>

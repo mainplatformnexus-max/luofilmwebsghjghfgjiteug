@@ -1,11 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../lib/firebase";
+
+const DEFAULT_IMAGE = "/download-app-banner.png";
+const DEFAULT_LINK  = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
 
 interface Props {
   onClose: () => void;
 }
 
 export default function DownloadAppModal({ onClose }: Props) {
+  const [bannerUrl, setBannerUrl] = useState(DEFAULT_IMAGE);
+  const [bannerLink, setBannerLink] = useState(DEFAULT_LINK);
+
+  useEffect(() => {
+    getDoc(doc(db, "settings", "main")).then(snap => {
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.floatBannerUrl) setBannerUrl(d.floatBannerUrl);
+        if (d.floatBannerLink) setBannerLink(d.floatBannerLink);
+      }
+    }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
@@ -56,7 +74,7 @@ export default function DownloadAppModal({ onClose }: Props) {
             width: 28,
             height: 28,
             borderRadius: "50%",
-            background: "rgba(0,0,0,0.45)",
+            background: "rgba(0,0,0,0.5)",
             border: "1px solid rgba(255,255,255,0.3)",
             color: "#fff",
             cursor: "pointer",
@@ -67,20 +85,22 @@ export default function DownloadAppModal({ onClose }: Props) {
             padding: 0,
           }}
           onMouseEnter={e => (e.currentTarget.style.background = "rgba(210,25,25,0.9)")}
-          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.45)")}
+          onMouseLeave={e => (e.currentTarget.style.background = "rgba(0,0,0,0.5)")}
         >
           <X size={13} style={{ pointerEvents: "none" }} />
         </button>
 
-        {/* Clicking the image downloads the APK */}
+        {/* Clicking the image goes to the configured link (APK download by default) */}
         <a
-          href="https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk"
-          download="luofilm.apk"
+          href={bannerLink}
+          download={bannerLink.endsWith(".apk") ? "luofilm.apk" : undefined}
+          target={bannerLink.endsWith(".apk") ? undefined : "_blank"}
+          rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
           style={{ display: "block", lineHeight: 0, cursor: "pointer" }}
         >
           <img
-            src="/download-app-banner.png"
+            src={bannerUrl}
             alt="Download LUOFILM App"
             draggable={false}
             style={{ width: "100%", height: "auto", display: "block" }}
