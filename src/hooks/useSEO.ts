@@ -46,7 +46,7 @@ export function useSEO({
 }: SEOConfig) {
   useEffect(() => {
     const fullTitle = title
-      ? `${title} | ${SITE_NAME} — Luo Translated Movies`
+      ? `${SITE_NAME} — ${title}`
       : `${SITE_NAME} — Luo Translated Movies & Drama | VJ Paul UG`;
 
     const fullDescription =

@@ -17,6 +17,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import VIPModal from "../components/VIPModal";
 import AuthModal from "../components/AuthModal";
 import { useAuth } from "../contexts/AuthContext";
+import { useSEO } from "../hooks/useSEO";
 
 function getEmbedInfo(url: string): { type: "video" | "iframe"; src: string } {
   if (!url) return { type: "video", src: "" };
@@ -82,6 +83,19 @@ export default function PlayPage() {
 
   const [show, setShow] = useState<Show | null>(null);
   const [rawData, setRawData] = useState<any>(null);
+
+  const posterImage = show?.coverUrl || show?.thumbnailUrl;
+  useSEO({
+    title: show
+      ? `${show.title} (Luo Translated${show.year ? ` ${show.year}` : ""}) — VJ Paul UG`
+      : "Watch Luo Translated Content",
+    description: show?.description
+      ? `${show.description} — Watch this Luo translated ${show.type === "movie" ? "movie" : "series"} by VJ Paul UG on LUOFILM.SITE. Free streaming.`
+      : "Watch Luo translated movies and drama by VJ Paul UG on LUOFILM.SITE — free streaming worldwide.",
+    image: posterImage,
+    url: `/play/${params.id}`,
+    type: show?.type === "movie" ? "video.movie" : "video.tv_show",
+  });
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [loadingShow, setLoadingShow] = useState(true);
   const [currentEp, setCurrentEp] = useState(1);
