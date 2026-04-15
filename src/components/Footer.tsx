@@ -67,8 +67,11 @@ export default function Footer() {
               <img src="/logo.png" alt="LUOFILM" style={{ height: 28, objectFit: "contain" }} />
               <span style={{ fontSize: 16, fontWeight: 800, color: "#fff", letterSpacing: 1 }}>LUOFILM</span>
             </div>
-            <p style={{ lineHeight: 1.7, fontSize: 12, marginBottom: 16 }}>
-              Stream the best Asian dramas, movies, variety shows, and anime — anytime, anywhere.
+            <p style={{ lineHeight: 1.7, fontSize: 12, marginBottom: 10 }}>
+              Download and stream Luo translated movies and drama translated by <strong style={{ color: "rgba(255,255,255,0.8)" }}>VJ Paul UG</strong>.
+            </p>
+            <p style={{ lineHeight: 1.7, fontSize: 11, color: "rgba(255,255,255,0.35)", marginBottom: 16 }}>
+              LUOFILM.SITE is owned by <strong style={{ color: "rgba(255,255,255,0.55)" }}>NEXUS PLATFORM</strong> under the management of <strong style={{ color: "rgba(255,255,255,0.55)" }}>GILBERT PAUL</strong>, licensed under <strong style={{ color: "rgba(255,255,255,0.55)" }}>AT DEVELOPERS SMC LIMITED</strong> — a professionally licensed & verified streaming platform by DMCA, operating worldwide.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {[
@@ -181,16 +184,23 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 style={{ color: "#fff", fontWeight: 700, fontSize: 13, marginBottom: 14, textTransform: "uppercase", letterSpacing: 0.5 }}>Download App</h4>
-            <p style={{ fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>Get the LUOFILM app and watch on any device, anytime.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <a href="#" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", color: "#fff", fontSize: 12, fontWeight: 600 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                App Store
+            <h4 style={{ color: "#fff", fontWeight: 700, fontSize: 13, marginBottom: 14, textTransform: "uppercase", letterSpacing: 0.5 }}>Contact Us</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <a
+                href="https://wa.me/256760734679"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.25)", textDecoration: "none", color: "#25d166", fontSize: 12, fontWeight: 600 }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp: +256 760 734 679
               </a>
-              <a href="#" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", color: "#fff", fontSize: 12, fontWeight: 600 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.3.17.64.22.98.14l12.23-7.06-2.76-2.76-10.45 9.68zm-1.51-18.5C1.4 5.67 1.29 6.1 1.29 6.58v10.84c0 .48.11.91.38 1.32l.07.07 6.07-6.07v-.14L1.67 5.26zm14.25 5.75l-2.02-2.02-4.55 4.55 2.02 2.02 4.55-4.55zm1.95-1.88l-1.01-1.01-4.55 4.55 1.01 1.01c.56.56.56 1.46 0 2.02l-4.55 4.55 1.01 1.01c.28.28.65.43 1.01.43s.73-.15 1.01-.43l7.09-7.09c.56-.56.56-1.46 0-2.02l-1.02-1.02z"/></svg>
-                Google Play
+              <a
+                href="mailto:mainplatform.nexus@gmail.com"
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 500 }}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                mainplatform.nexus@gmail.com
               </a>
             </div>
           </div>
