@@ -47,7 +47,7 @@ export default function Footer() {
       fontSize: 13,
       marginTop: 40,
     }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px 0" }}>
+      <div style={{ padding: "40px 20px 0" }}>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 36, marginBottom: 36 }}>
 
