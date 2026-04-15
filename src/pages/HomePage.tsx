@@ -219,8 +219,6 @@ export default function HomePage() {
                   opacity: isTransitioning ? 0.7 : 1, transition: "opacity 0.4s ease",
                 }}
               />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)" }} />
-              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)" }} />
 
               <div className="carousel-overlay" style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px 20px" }}>
                 {currentShow.badge && currentShow.badge !== "none" && (
@@ -319,7 +317,6 @@ function SideShowCard({ show }: { show: Show }) {
       <div style={{ flex: 1, position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a", cursor: "pointer" }}>
         <div style={{ paddingTop: "56.25%" }} />
         <img src={show.thumbnailUrl} alt={show.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 55%)" }} />
         {show.badge && show.badge !== "none" && (
           <span style={{ position: "absolute", top: 0, right: 0, padding: "2px 7px", borderRadius: "0 6px 0 6px", fontSize: 11, fontWeight: 700, background: show.badge === "VIP" ? "linear-gradient(90deg,#ffc552,#ffdd9a)" : show.badge === "Express" ? "linear-gradient(90deg,#00a3f5,#00c9fd)" : "linear-gradient(90deg,#8819ff,#ad61ff)", color: show.badge === "VIP" ? "#4e2d03" : "#fff" }}>
             {show.badge}
@@ -398,8 +395,6 @@ function SecondaryCarousel({ shows }: { shows: Show[] }) {
           opacity: fading ? 0.5 : 1, transition: "opacity 0.3s ease",
         }}
       />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)" }} />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%)" }} />
 
       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 16px 14px" }}>
         {current.badge && current.badge !== "none" && (
