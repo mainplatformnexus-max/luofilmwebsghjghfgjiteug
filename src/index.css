@@ -798,10 +798,10 @@ input, button, select, textarea {
     max-width: 100% !important;
   }
   .carousel-main-wrap {
+    flex: 1 1 100% !important;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    flex-shrink: 1 !important;
   }
   .carousel-side-panel {
     display: none !important;
@@ -1176,6 +1176,143 @@ input, button, select, textarea {
     width: 92vw !important;
     max-width: 360px !important;
     max-height: 90vh !important;
+  }
+
+  /* Hide right carousel on mobile - too narrow */
+  .secondary-carousel {
+    display: none !important;
+  }
+}
+
+/* ===== TABLET (768px – 1024px) ===== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  html, body, #root {
+    overflow-x: hidden;
+  }
+
+  /* --- Hero carousel --- */
+  .carousel-wrapper {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  /* Left hero: 54% of viewport, right carousel gets the rest */
+  .carousel-main-wrap {
+    flex: 0 0 54% !important;
+    min-width: 0 !important;
+  }
+
+  /* Hide middle featured panel on tablet — too cramped for 3 columns */
+  .carousel-side-panel {
+    display: none !important;
+  }
+
+  /* Right carousel fills remaining space */
+  .secondary-carousel {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: block !important;
+  }
+
+  .carousel-title {
+    font-size: 17px !important;
+  }
+
+  .carousel-desc {
+    font-size: 11px !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  .carousel-overlay {
+    padding: 16px 14px 14px !important;
+  }
+
+  .carousel-btn {
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* --- Content rows --- */
+  .content-row-section {
+    margin-bottom: 20px !important;
+  }
+
+  .content-card {
+    width: 120px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .content-row-scroll {
+    gap: 8px !important;
+  }
+
+  .content-row-title {
+    font-size: 14px !important;
+  }
+
+  /* --- Play page --- */
+  .play-main-layout {
+    padding: 0 14px 30px !important;
+    gap: 16px !important;
+  }
+
+  .play-sidebar {
+    display: block !important;
+    width: 210px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .play-title {
+    font-size: 16px !important;
+  }
+
+  .play-meta {
+    font-size: 11px !important;
+  }
+
+  /* --- Category pages --- */
+  .category-featured {
+    height: 220px !important;
+  }
+
+  .category-featured-desc {
+    display: block !important;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .category-page-pad {
+    padding: 14px 12px 40px !important;
+  }
+
+  /* --- Play recommended / watchlist grids --- */
+  .play-recommended-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .watchlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  /* --- Header --- */
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+
+  .mobile-header-spacer {
+    height: 60px !important;
+  }
+
+  /* --- VIP modal --- */
+  .vip-modal-container {
+    width: 90vw !important;
+    max-width: 600px !important;
   }
 }
 
