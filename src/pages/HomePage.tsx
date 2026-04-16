@@ -117,28 +117,31 @@ export default function HomePage() {
           setBannerShows(movies.length > 0 ? movies.slice(0, 8) : allShows.slice(0, 8));
         }
 
-        // Right secondary carousel — shows what admin uploaded in carousel manager
-        // Uses "Left Carousel" items (page="home") first, then "Right Carousel" (page="carousel2")
-        const adminCarousel = (carouselItems as CarouselItem[])
-          .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
+        // Right secondary carousel — uses "Right Carousel" (carousel2) items first,
+        // falls back to "Left Carousel" (page="home") items if carousel2 is empty
         const secondary: Show[] = [];
-        for (const item of adminCarousel) {
+        for (const item of secondaryItems as CarouselItem[]) {
           const s = carouselToShow(item, contentMap);
           if (s) secondary.push(s);
         }
-        // Fall back to carousel2 if Left Carousel is empty
         if (secondary.length === 0) {
-          for (const item of secondaryItems as CarouselItem[]) {
+          const adminCarousel = (carouselItems as CarouselItem[])
+            .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
+          for (const item of adminCarousel) {
             const s = carouselToShow(item, contentMap);
             if (s) secondary.push(s);
           }
         }
         setSecondaryShows(secondary);
 
-        // Middle featured panel (page === "home" in featured collection)
+        // Middle featured panel — uses pre-joined _content so any content (published or not) can appear
         const featured: Show[] = [];
         for (const item of featuredItems as any[]) {
-          if (item.contentId) {
+          const raw = item._content;
+          if (raw) {
+            featured.push(toShow(raw));
+          } else if (item.contentId) {
+            // fallback: try published contentMap
             const s = contentMap.get(item.contentId);
             if (s) featured.push(s);
           }

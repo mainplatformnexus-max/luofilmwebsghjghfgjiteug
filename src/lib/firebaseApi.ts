@@ -495,10 +495,18 @@ export const fbApi = {
       return items.sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
     },
     getHomeFeatured: async () => {
-      const snap = await getDocs(collection(db, "featured"));
-      const items = snap.docs.map(docToObj)
+      const [featuredSnap, contentSnap] = await Promise.all([
+        getDocs(collection(db, "featured")),
+        getDocs(collection(db, "content")),
+      ]);
+      const allContentMap = new Map(contentSnap.docs.map(d => [d.id, docToObj(d)]));
+      const items = featuredSnap.docs.map(docToObj)
         .filter((d: any) => d.page === "home" && d.isActive !== false)
-        .sort((a: any, b: any) => (a.order ?? a.sortOrder ?? 0) - (b.order ?? b.sortOrder ?? 0));
+        .sort((a: any, b: any) => (a.order ?? a.sortOrder ?? 0) - (b.order ?? b.sortOrder ?? 0))
+        .map((item: any) => ({
+          ...item,
+          _content: item.contentId ? allContentMap.get(item.contentId) || null : null,
+        }));
       return items;
     },
   },
