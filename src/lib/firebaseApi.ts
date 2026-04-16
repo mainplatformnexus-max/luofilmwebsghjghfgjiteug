@@ -171,15 +171,18 @@ export const fbApi = {
 
   carousel: {
     list: async () => {
-      const snap = await getDocs(query(collection(db, "carousel"), orderBy("order", "asc")));
-      return snap.docs.map(docToObj);
+      const snap = await getDocs(collection(db, "carousel"));
+      const items = snap.docs.map(docToObj);
+      return items.sort((a: any, b: any) => (a.sortOrder ?? a.order ?? 0) - (b.sortOrder ?? b.order ?? 0));
     },
     create: async (data: any) => {
-      const ref2 = await addDoc(collection(db, "carousel"), { ...data, createdAt: serverTimestamp() });
+      const payload = { ...data, order: data.sortOrder ?? 0, createdAt: serverTimestamp() };
+      const ref2 = await addDoc(collection(db, "carousel"), payload);
       return { id: ref2.id };
     },
     update: async (id: string, data: any) => {
-      await updateDoc(doc(db, "carousel", id), data);
+      const payload = { ...data, order: data.sortOrder ?? data.order ?? 0 };
+      await updateDoc(doc(db, "carousel", id), payload);
       return { id };
     },
     delete: async (id: string) => {
@@ -190,8 +193,9 @@ export const fbApi = {
 
   featured: {
     list: async () => {
-      const snap = await getDocs(query(collection(db, "featured"), orderBy("order", "asc")));
-      return snap.docs.map(docToObj);
+      const snap = await getDocs(collection(db, "featured"));
+      const items = snap.docs.map(docToObj);
+      return items.sort((a: any, b: any) => (a.order ?? a.sortOrder ?? 0) - (b.order ?? b.sortOrder ?? 0));
     },
     create: async (data: any) => {
       const ref2 = await addDoc(collection(db, "featured"), { ...data, createdAt: serverTimestamp() });
