@@ -1,4 +1,4 @@
-const PAYMENT_BASE = "https://function-bun-production-ac72.up.railway.app";
+const PAYMENT_BASE = "https://function-bun-production-37b5.up.railway.app";
 
 function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
