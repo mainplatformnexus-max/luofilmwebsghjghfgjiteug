@@ -225,7 +225,7 @@ export default function CarouselManager() {
   const isEditing = modal && modal !== "create";
 
   const getModalTitle = () => {
-    if (tab === "left") return isCreating ? "Add Left Carousel Slide" : "Edit Left Carousel Slide";
+    if (tab === "left") return isCreating ? "Add Main Hero Slide" : "Edit Main Hero Slide";
     if (tab === "right") return isCreating ? "Add Right Carousel Slide" : "Edit Right Carousel Slide";
     return isCreating ? "Add Featured Item" : "Edit Featured Item";
   };
@@ -256,7 +256,7 @@ export default function CarouselManager() {
 
       <div style={{ display: "flex", gap: 0, marginBottom: 24, border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, overflow: "hidden", width: "fit-content" }}>
         {([
-          { key: "left", label: "🎠 Left Carousel" },
+          { key: "left", label: "🎠 Main Hero (Left)" },
           { key: "right", label: "🎞 Right Carousel" },
           { key: "featured", label: "⭐ Featured (Middle)" },
         ] as const).map(t => (

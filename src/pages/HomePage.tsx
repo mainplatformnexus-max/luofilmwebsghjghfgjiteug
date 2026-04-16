@@ -111,26 +111,28 @@ export default function HomePage() {
 
         const contentMap = new Map<string, Show>(allShows.map(s => [s.id, s]));
 
-        // First hero carousel — always shows movies/all content from the database
-        if (allShows.length > 0) {
+        // Main left hero — uses "Left Carousel" (page="home") admin items when configured,
+        // falls back to movies from the database if admin has not set any left carousel slides
+        const leftAdminItems = (carouselItems as CarouselItem[])
+          .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
+        const adminBanner: Show[] = [];
+        for (const item of leftAdminItems) {
+          const s = carouselToShow(item, contentMap);
+          if (s) adminBanner.push(s);
+        }
+        if (adminBanner.length > 0) {
+          setBannerShows(adminBanner);
+        } else if (allShows.length > 0) {
           const movies = allShows.filter(s => s.type === "movie");
           setBannerShows(movies.length > 0 ? movies.slice(0, 8) : allShows.slice(0, 8));
         }
 
-        // Right secondary carousel — uses "Right Carousel" (carousel2) items first,
-        // falls back to "Left Carousel" (page="home") items if carousel2 is empty
+        // Right secondary carousel — uses "Right Carousel" (carousel2) items ONLY
+        // No fallback: if admin didn't configure carousel2, the right panel stays hidden
         const secondary: Show[] = [];
         for (const item of secondaryItems as CarouselItem[]) {
           const s = carouselToShow(item, contentMap);
           if (s) secondary.push(s);
-        }
-        if (secondary.length === 0) {
-          const adminCarousel = (carouselItems as CarouselItem[])
-            .filter(item => (!item.page || item.page === "home") && item.isActive !== false);
-          for (const item of adminCarousel) {
-            const s = carouselToShow(item, contentMap);
-            if (s) secondary.push(s);
-          }
         }
         setSecondaryShows(secondary);
 
