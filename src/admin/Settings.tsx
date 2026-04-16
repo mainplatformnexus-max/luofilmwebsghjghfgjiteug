@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Save, Shield, Globe, Database, Bell, Loader, ImageIcon } from "lucide-react";
+import { Save, Shield, Globe, Database, Bell, Loader, ImageIcon, CreditCard } from "lucide-react";
 import { api } from "./api";
 import { auth } from "../lib/firebase";
+import { clearPaymentBaseCache } from "../lib/paymentApi";
 import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
 const TIMEZONES = [
@@ -29,6 +30,7 @@ const DEFAULT_SETTINGS = {
   twoFactor: false,
   floatBannerUrl: "",
   floatBannerLink: "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk",
+  paymentBackendUrl: "https://function-bun-production-37b5.up.railway.app",
 };
 
 const inp: React.CSSProperties = {
@@ -105,6 +107,7 @@ export default function Settings() {
     setStatus("idle");
     try {
       await api.settings.save({ ...settings, currency: "UGX" });
+      clearPaymentBaseCache();
       setStatus("saved");
       setStatusMsg("Settings saved successfully!");
       setTimeout(() => setStatus("idle"), 3000);
@@ -276,6 +279,27 @@ export default function Settings() {
               onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               style={{ maxWidth: 320, borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", display: "block" }}
             />
+          </div>
+        )}
+      </Section>
+
+      <Section title="Payment Backend" icon={CreditCard}>
+        <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(16,185,129,0.08)", borderRadius: 8, border: "1px solid rgba(16,185,129,0.25)" }}>
+          <span style={{ fontSize: 12, color: "#10b981" }}>
+            Set the base URL of your payment backend server. All payment requests (deposits, withdrawals, status checks) will be sent to this URL. Leave as default if unchanged.
+          </span>
+        </div>
+        <Field label="Payment Backend URL" hint="e.g. https://your-payment-server.railway.app — no trailing slash">
+          <input
+            style={inp}
+            value={(settings as any).paymentBackendUrl || ""}
+            onChange={e => set("paymentBackendUrl", e.target.value)}
+            placeholder="https://function-bun-production-37b5.up.railway.app"
+          />
+        </Field>
+        {(settings as any).paymentBackendUrl && (
+          <div style={{ marginTop: 4, padding: "8px 12px", borderRadius: 6, background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)", fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+            Active endpoint: <span style={{ color: "#34d399", fontWeight: 600 }}>{(settings as any).paymentBackendUrl}</span>
           </div>
         )}
       </Section>

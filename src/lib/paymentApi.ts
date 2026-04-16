@@ -1,4 +1,30 @@
-const PAYMENT_BASE = "https://function-bun-production-37b5.up.railway.app";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "./firebase";
+
+const FALLBACK_BASE = "https://function-bun-production-37b5.up.railway.app";
+
+let _cachedPaymentBase: string | null = null;
+
+async function getPaymentBase(): Promise<string> {
+  if (_cachedPaymentBase) return _cachedPaymentBase;
+  try {
+    const snap = await getDoc(doc(db, "settings", "main"));
+    if (snap.exists()) {
+      const url: string = snap.data()?.paymentBackendUrl || "";
+      if (url) {
+        _cachedPaymentBase = url.replace(/\/$/, "");
+        return _cachedPaymentBase;
+      }
+    }
+  } catch {
+  }
+  _cachedPaymentBase = FALLBACK_BASE;
+  return _cachedPaymentBase;
+}
+
+export function clearPaymentBaseCache() {
+  _cachedPaymentBase = null;
+}
 
 function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -10,8 +36,9 @@ function normalizePhone(phone: string): string {
 }
 
 async function post(path: string, body: object) {
-  console.log("[PaymentAPI] POST", path, body);
-  const res = await fetch(`${PAYMENT_BASE}${path}`, {
+  const base = await getPaymentBase();
+  console.log("[PaymentAPI] POST", path, body, "→", base);
+  const res = await fetch(`${base}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -30,8 +57,9 @@ async function post(path: string, body: object) {
 }
 
 async function get(path: string) {
-  console.log("[PaymentAPI] GET", path);
-  const res = await fetch(`${PAYMENT_BASE}${path}`);
+  const base = await getPaymentBase();
+  console.log("[PaymentAPI] GET", path, "→", base);
+  const res = await fetch(`${base}${path}`);
   const data = await res.json();
   console.log("[PaymentAPI] Response", path, res.status, data);
   if (!res.ok) {
