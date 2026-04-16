@@ -414,12 +414,14 @@ export const fbApi = {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         await deleteDoc(ref);
+        try { await updateDoc(doc(db, "content", contentId), { savesCount: increment(-1) }); } catch {}
         return false;
       } else {
         await setDoc(ref, {
           contentId, userId, createdAt: serverTimestamp(),
           ...(contentMeta || {}),
         });
+        try { await updateDoc(doc(db, "content", contentId), { savesCount: increment(1) }); } catch {}
         return true;
       }
     },
@@ -512,6 +514,33 @@ export const fbApi = {
           _content: item.contentId ? allContentMap.get(item.contentId) || null : null,
         }));
       return items;
+    },
+  },
+
+  comments: {
+    list: async (contentId: string) => {
+      const snap = await getDocs(
+        query(
+          collection(db, "comments"),
+          where("contentId", "==", contentId),
+          orderBy("createdAt", "desc"),
+          limit(100)
+        )
+      );
+      return snap.docs.map(docToObj);
+    },
+    add: async (contentId: string, userId: string, userName: string, text: string) => {
+      const ref = await addDoc(collection(db, "comments"), {
+        contentId,
+        userId,
+        userName,
+        text: text.trim(),
+        createdAt: serverTimestamp(),
+      });
+      return ref.id;
+    },
+    delete: async (commentId: string) => {
+      await deleteDoc(doc(db, "comments", commentId));
     },
   },
 };

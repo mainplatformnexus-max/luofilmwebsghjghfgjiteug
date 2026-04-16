@@ -100,11 +100,17 @@ export default function PlayPage() {
   const [loadingShow, setLoadingShow] = useState(true);
   const [currentEp, setCurrentEp] = useState(1);
   const [epPage, setEpPage] = useState(0);
-  const [activeTab, setActiveTab] = useState<"EPISODES" | "RECOMMENDED" | "SYNOPSIS">("EPISODES");
+  const [activeTab, setActiveTab] = useState<"EPISODES" | "RECOMMENDED" | "COMMENTS">("EPISODES");
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [saved, setSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [savesCount, setSavesCount] = useState(0);
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentsLoaded, setCommentsLoaded] = useState(false);
   const [shareLabel, setShareLabel] = useState<"SHARE" | "COPIED!">("SHARE");
   const [downloaded, setDownloaded] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -138,10 +144,16 @@ export default function PlayPage() {
     setShow(null);
     setEpisodes([]);
     setRelated([]);
+    setCommentsLoaded(false);
+    setComments([]);
+    setLikesCount(0);
+    setSavesCount(0);
     fbApi.publicContent.getById(params.id).then((d) => {
       if (d) {
         setShow(toShow(d));
         setRawData(d);
+        setLikesCount(Number(d.likesCount) || 0);
+        setSavesCount(Number(d.savesCount) || 0);
         setActiveTab(d.type === "series" ? "EPISODES" : "RECOMMENDED");
         if (d.type === "series") {
           fbApi.content.episodes.list(params.id).then((r) => {
@@ -246,6 +258,7 @@ export default function PlayPage() {
     try {
       const nowLiked = await fbApi.userActions.toggleLike(params.id, anonId);
       setLiked(nowLiked);
+      setLikesCount(prev => Math.max(0, prev + (nowLiked ? 1 : -1)));
       showToast(nowLiked ? "Added to likes!" : "Removed from likes");
     } catch { showToast("Could not update like"); }
     finally { setLikeLoading(false); }
@@ -261,6 +274,7 @@ export default function PlayPage() {
         type: show.type,
       });
       setSaved(nowSaved);
+      setSavesCount(prev => Math.max(0, prev + (nowSaved ? 1 : -1)));
       showToast(nowSaved ? "Saved to watchlist!" : "Removed from watchlist");
     } catch { showToast("Could not update watchlist"); }
     finally { setSaveLoading(false); }
@@ -279,6 +293,50 @@ export default function PlayPage() {
       setTimeout(() => setShareLabel("SHARE"), 2000);
       showToast("Link copied to clipboard!");
     } catch { showToast("Copy this link: " + url); }
+  };
+
+  const loadComments = async () => {
+    if (!params.id) return;
+    try {
+      const list = await fbApi.comments.list(params.id);
+      setComments(list);
+      setCommentsLoaded(true);
+    } catch { setCommentsLoaded(true); }
+  };
+
+  const handleCommentTabSwitch = () => {
+    setActiveTab("COMMENTS");
+    if (!commentsLoaded) loadComments();
+  };
+
+  const handleComment = async () => {
+    if (!params.id || !commentText.trim() || submittingComment) return;
+    const userName = user?.displayName || user?.email?.split("@")[0] || "Guest";
+    const userId = user?.uid || anonId;
+    setSubmittingComment(true);
+    try {
+      const id = await fbApi.comments.add(params.id, userId, userName, commentText);
+      const newComment = {
+        id,
+        contentId: params.id,
+        userId,
+        userName,
+        text: commentText.trim(),
+        createdAt: Date.now(),
+      };
+      setComments(prev => [newComment, ...prev]);
+      setCommentText("");
+      showToast("Comment posted!");
+    } catch { showToast("Could not post comment"); }
+    finally { setSubmittingComment(false); }
+  };
+
+  const formatCommentTime = (ts: number) => {
+    const diff = Date.now() - ts;
+    if (diff < 60000) return "just now";
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return `${Math.floor(diff / 86400000)}d ago`;
   };
 
   const getDownloadLinks = (): { key: string; label: string; url: string }[] => {
@@ -374,8 +432,8 @@ export default function PlayPage() {
   const hasSubtitles = subtitleTracks.length > 0;
 
   const tabs = isSeries
-    ? (["EPISODES", "RECOMMENDED", "SYNOPSIS"] as const)
-    : (["RECOMMENDED", "SYNOPSIS"] as const);
+    ? (["EPISODES", "RECOMMENDED", "COMMENTS"] as const)
+    : (["RECOMMENDED", "COMMENTS"] as const);
 
   return (
     <>
@@ -598,6 +656,7 @@ export default function PlayPage() {
                 <ActionBtn
                   icon={<ThumbsUp size={14} fill={liked ? "#fff" : "none"} color={liked ? "#fff" : "#60a5fa"} />}
                   label={likeLoading ? "…" : liked ? "LIKED" : "LIKE"}
+                  count={likesCount}
                   active={liked}
                   color={{
                     bg: "rgba(59,130,246,0.08)",
@@ -610,6 +669,7 @@ export default function PlayPage() {
                 <ActionBtn
                   icon={<Heart size={14} fill={saved ? "#fff" : "none"} color={saved ? "#fff" : "#f472b6"} />}
                   label={saveLoading ? "…" : saved ? "SAVED" : "SAVE"}
+                  count={savesCount}
                   active={saved}
                   color={{
                     bg: "rgba(244,114,182,0.08)",
@@ -728,7 +788,7 @@ export default function PlayPage() {
               {tabs.map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => tab === "COMMENTS" ? handleCommentTabSwitch() : setActiveTab(tab)}
                   style={{
                     padding: "10px 20px",
                     fontSize: 14,
@@ -742,7 +802,7 @@ export default function PlayPage() {
                     transition: "all 0.2s",
                   }}
                 >
-                  {tab}
+                  {tab === "COMMENTS" ? `COMMENTS${comments.length > 0 ? ` (${comments.length})` : ""}` : tab}
                 </button>
               ))}
             </div>
@@ -835,56 +895,110 @@ export default function PlayPage() {
                 </div>
               )}
 
-              {activeTab === "SYNOPSIS" && (
-                <div>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 16,
-                      marginBottom: 16,
-                    }}
-                  >
-                    <img
-                      src={show.coverUrl}
-                      alt={show.title}
-                      style={{
-                        width: 90,
-                        height: 120,
-                        objectFit: "cover",
-                        borderRadius: 4,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <div>
-                      <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>
-                        {show.title}
-                      </h2>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                        {[
-                          ["TYPE", isSeries ? "Series" : "Movie"],
-                          ["GENRE", show.genre],
-                          ["YEAR", String(show.year)],
-                          ...(isSeries ? [["EPISODES", `${show.episodeCount} EPS`]] : []),
-                          ["RATING", String(show.rating)],
-                        ].map(([k, v]) => (
-                          <div key={k} style={{ display: "flex", gap: 10, fontSize: 13 }}>
-                            <span style={{ color: "rgba(255,255,255,0.35)", width: 70 }}>{k}</span>
-                            <span style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
+              {activeTab === "COMMENTS" && (
+                <div style={{ maxWidth: 680 }}>
+                  {/* Comment input */}
+                  <div style={{ marginBottom: 20 }}>
+                    {user ? (
+                      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                        <div style={{
+                          flexShrink: 0, width: 34, height: 34, borderRadius: "50%",
+                          background: "linear-gradient(135deg,#00a9f5,#3b82f6)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 14, fontWeight: 700, color: "#fff",
+                        }}>
+                          {(user.displayName || user.email || "?")[0].toUpperCase()}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <textarea
+                            value={commentText}
+                            onChange={e => setCommentText(e.target.value)}
+                            placeholder="Write a comment..."
+                            rows={3}
+                            maxLength={500}
+                            style={{
+                              width: "100%", background: "rgba(255,255,255,0.05)",
+                              border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+                              color: "#fff", fontSize: 13, padding: "10px 12px",
+                              resize: "vertical", outline: "none", boxSizing: "border-box",
+                              fontFamily: "inherit",
+                            }}
+                            onFocus={e => (e.currentTarget.style.borderColor = "rgba(0,169,245,0.5)")}
+                            onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
+                          />
+                          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
+                            <button
+                              onClick={handleComment}
+                              disabled={!commentText.trim() || submittingComment}
+                              style={{
+                                padding: "6px 18px", borderRadius: 6, fontSize: 12, fontWeight: 700,
+                                background: commentText.trim() && !submittingComment ? "#00a9f5" : "rgba(255,255,255,0.08)",
+                                color: commentText.trim() && !submittingComment ? "#fff" : "rgba(255,255,255,0.3)",
+                                border: "none", cursor: commentText.trim() && !submittingComment ? "pointer" : "not-allowed",
+                                transition: "all 0.2s",
+                              }}
+                            >
+                              {submittingComment ? "Posting…" : "POST"}
+                            </button>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div style={{
+                        padding: "14px 16px", background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+                      }}>
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>Sign in to join the conversation</span>
+                        <button
+                          onClick={() => setShowAuth(true)}
+                          style={{
+                            padding: "6px 16px", borderRadius: 6, fontSize: 12, fontWeight: 700,
+                            background: "#00a9f5", color: "#fff", border: "none", cursor: "pointer",
+                          }}
+                        >
+                          SIGN IN
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: "rgba(255,255,255,0.6)",
-                      lineHeight: 1.8,
-                      maxWidth: 680,
-                    }}
-                  >
-                    {show.description}
-                  </p>
+
+                  {/* Comments list */}
+                  {!commentsLoaded ? (
+                    <div style={{ textAlign: "center", padding: "30px 0", color: "rgba(255,255,255,0.3)", fontSize: 13 }}>
+                      Loading comments…
+                    </div>
+                  ) : comments.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "30px 0" }}>
+                      <MessageSquare size={32} color="rgba(255,255,255,0.15)" style={{ marginBottom: 8 }} />
+                      <div style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>No comments yet. Be the first!</div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      {comments.map(c => (
+                        <div key={c.id} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                          <div style={{
+                            flexShrink: 0, width: 32, height: 32, borderRadius: "50%",
+                            background: "linear-gradient(135deg,#8819ff,#c084fc)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 13, fontWeight: 700, color: "#fff",
+                          }}>
+                            {(c.userName || "?")[0].toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.9)" }}>{c.userName}</span>
+                              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{formatCommentTime(c.createdAt)}</span>
+                            </div>
+                            <p style={{
+                              margin: 0, fontSize: 13, color: "rgba(255,255,255,0.7)",
+                              lineHeight: 1.6, wordBreak: "break-word",
+                            }}>{c.text}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1239,16 +1353,22 @@ export default function PlayPage() {
 function ActionBtn({
   icon,
   label,
+  count,
   active,
   color,
   onClick,
 }: {
   icon: React.ReactNode;
   label: string;
+  count?: number;
   active?: boolean;
   color: { bg: string; border: string; glow: string; activeBg: string };
   onClick?: () => void;
 }) {
+  const displayCount = count !== undefined && count > 0
+    ? count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count)
+    : null;
+
   return (
     <button
       onClick={onClick}
@@ -1257,7 +1377,7 @@ function ActionBtn({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 4,
+        gap: 2,
         background: active ? color.activeBg : color.bg,
         border: `1px solid ${active ? color.border : "rgba(255,255,255,0.08)"}`,
         borderRadius: 8,
@@ -1271,6 +1391,18 @@ function ActionBtn({
       }}
     >
       {icon}
+      {displayCount !== null && (
+        <span style={{
+          fontSize: 11,
+          fontWeight: 700,
+          color: active ? "#fff" : "rgba(255,255,255,0.85)",
+          lineHeight: 1,
+          userSelect: "none",
+          WebkitUserSelect: "none",
+        }}>
+          {displayCount}
+        </span>
+      )}
       <span className="play-action-btn-label" style={{
         fontSize: 8,
         fontWeight: 700,
