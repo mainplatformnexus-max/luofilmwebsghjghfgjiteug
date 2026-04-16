@@ -201,7 +201,12 @@ export default function HomePage() {
 
   const currentIdx = bannerShows.length > 0 ? Math.min(activeSlide, bannerShows.length - 1) : 0;
   const currentShow = bannerShows[currentIdx];
-  const midPanel = featuredShows.length > 0 ? featuredShows : bannerShows.filter((_, i) => i !== currentIdx);
+  const midFallback = bannerShows.filter((_, i) => i !== currentIdx);
+  const midPanel = featuredShows.length > 0
+    ? featuredShows
+    : midFallback.length > 0
+      ? midFallback
+      : shows.slice(0, 6);
   const sideShows = midPanel.slice(0, 2);
   const miniShows = midPanel.slice(2, 6);
 
@@ -219,7 +224,7 @@ export default function HomePage() {
         </div>
       ) : (
         <div className="carousel-wrapper" style={{ display: "flex", gap: 8, padding: "10px 12px", boxSizing: "border-box" }}>
-          <div className="carousel-main-wrap" style={{ flex: 1, position: "relative", minWidth: 0 }}>
+          <div className="carousel-main-wrap" style={{ flex: "0 0 48%", position: "relative", minWidth: 0 }}>
             <div className="carousel-mobile-full" style={{ width: "100%", position: "relative", overflow: "hidden", borderRadius: 6, background: "#1a1a1a" }}>
               <div style={{ paddingTop: "56.25%" }} />
               <img
@@ -275,8 +280,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="carousel-side-panel" style={{ flex: "0 0 auto", width: 190, display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
-            <div style={{ display: "flex", gap: 8, flex: "0 0 auto" }}>
+          <div className="carousel-side-panel" style={{ flex: "0 0 200px", display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: "0 0 auto" }}>
               {sideShows.map((show) => <SideShowCard key={show.id} show={show} />)}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
@@ -326,7 +331,7 @@ export default function HomePage() {
 function SideShowCard({ show }: { show: Show }) {
   return (
     <Link href={`/play/${show.id}`}>
-      <div style={{ flex: 1, position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a", cursor: "pointer" }}>
+      <div style={{ position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a", cursor: "pointer" }}>
         <div style={{ paddingTop: "56.25%" }} />
         <img src={show.thumbnailUrl} alt={show.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }} />
         {show.badge && show.badge !== "none" && (
