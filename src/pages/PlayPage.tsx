@@ -100,7 +100,7 @@ export default function PlayPage() {
   const [loadingShow, setLoadingShow] = useState(true);
   const [currentEp, setCurrentEp] = useState(1);
   const [epPage, setEpPage] = useState(0);
-  const [activeTab, setActiveTab] = useState<"EPISODES" | "RECOMMENDED" | "COMMENTS">("EPISODES");
+  const [activeTab, setActiveTab] = useState<"EPISODES" | "RECOMMENDED" | "SYNOPSIS" | "COMMENTS">("EPISODES");
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -432,8 +432,8 @@ export default function PlayPage() {
   const hasSubtitles = subtitleTracks.length > 0;
 
   const tabs = isSeries
-    ? (["EPISODES", "RECOMMENDED", "COMMENTS"] as const)
-    : (["RECOMMENDED", "COMMENTS"] as const);
+    ? (["EPISODES", "RECOMMENDED", "SYNOPSIS", "COMMENTS"] as const)
+    : (["RECOMMENDED", "SYNOPSIS", "COMMENTS"] as const);
 
   return (
     <>
@@ -892,6 +892,38 @@ export default function PlayPage() {
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {activeTab === "SYNOPSIS" && (
+                <div>
+                  <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
+                    <img
+                      src={show.coverUrl}
+                      alt={show.title}
+                      style={{ width: 90, height: 120, objectFit: "cover", borderRadius: 4, flexShrink: 0 }}
+                    />
+                    <div>
+                      <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{show.title}</h2>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                        {[
+                          ["TYPE", isSeries ? "Series" : "Movie"],
+                          ["GENRE", show.genre],
+                          ["YEAR", String(show.year)],
+                          ...(isSeries ? [["EPISODES", `${show.episodeCount} EPS`]] : []),
+                          ["RATING", String(show.rating)],
+                        ].map(([k, v]) => (
+                          <div key={k} style={{ display: "flex", gap: 10, fontSize: 13 }}>
+                            <span style={{ color: "rgba(255,255,255,0.35)", width: 70 }}>{k}</span>
+                            <span style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.8, maxWidth: 680 }}>
+                    {show.description}
+                  </p>
                 </div>
               )}
 
