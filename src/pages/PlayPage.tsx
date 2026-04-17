@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Film,
   Lock,
-  Smartphone,
 } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
@@ -112,10 +111,9 @@ export default function PlayPage() {
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentsLoaded, setCommentsLoaded] = useState(false);
   const [shareLabel, setShareLabel] = useState<"SHARE" | "COPIED!">("SHARE");
-  const [downloaded, setDownloaded] = useState(false);
+
   const [downloading, setDownloading] = useState(false);
   const [showQualityPicker, setShowQualityPicker] = useState(false);
-  const [downloadQuality, setDownloadQuality] = useState("");
   const [subtitlesOn, setSubtitlesOn] = useState(false);
   const [related, setRelated] = useState<any[]>([]);
   const [toast, setToast] = useState<string | null>(null);
@@ -365,8 +363,6 @@ export default function PlayPage() {
     if (isEmbed) {
       showToast("Opening in new tab for download");
       window.open(url, "_blank");
-      setDownloadQuality(quality);
-      setDownloaded(true);
       return;
     }
     setDownloading(true);
@@ -382,8 +378,6 @@ export default function PlayPage() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setDownloadQuality(quality);
-      setDownloaded(true);
       showToast("Download started!");
     } catch {
       showToast("Download failed. Please try again.");
@@ -693,9 +687,9 @@ export default function PlayPage() {
                 />
                 <div style={{ position: "relative", userSelect: "none", WebkitUserSelect: "none" }}>
                   <ActionBtn
-                    icon={isSubscribed ? <Download size={14} color={downloaded ? "#fff" : "#fb923c"} /> : <Lock size={14} color="#fb923c" />}
-                    label={downloaded ? `${downloadQuality}` : "DOWNLOAD"}
-                    active={downloaded}
+                    icon={isSubscribed ? <Download size={14} color="#fb923c" /> : <Lock size={14} color="#fb923c" />}
+                    label="DOWNLOAD"
+                    active={false}
                     color={{
                       bg: "rgba(251,146,60,0.08)",
                       border: "#fb923c",
@@ -704,8 +698,7 @@ export default function PlayPage() {
                     }}
                     onClick={() => {
                       if (!isSubscribed) { setShowVIP(true); return; }
-                      if (downloaded) { setDownloaded(false); setDownloadQuality(""); }
-                      else setShowQualityPicker(!showQualityPicker);
+                      setShowQualityPicker(!showQualityPicker);
                     }}
                   />
                   {showQualityPicker && (() => {
@@ -754,14 +747,14 @@ export default function PlayPage() {
                   })()}
                 </div>
                 <ActionBtn
-                  icon={<Smartphone size={14} color="#00a9f5" />}
+                  icon={<img src="/luofilm-app-icon.png" alt="App" style={{ width: 22, height: 22, borderRadius: 5, objectFit: "cover", display: "block" }} />}
                   label="OPEN IN APP"
                   active={false}
                   color={{
-                    bg: "rgba(0,169,245,0.08)",
-                    border: "#00a9f5",
-                    glow: "rgba(0,169,245,0.4)",
-                    activeBg: "linear-gradient(135deg,#0080c8,#00a9f5)",
+                    bg: "rgba(204,0,204,0.08)",
+                    border: "#cc00cc",
+                    glow: "rgba(204,0,204,0.4)",
+                    activeBg: "linear-gradient(135deg,#9900cc,#cc00cc)",
                   }}
                   onClick={() => {
                     window.location.href = `luofilm:///play/${params.id}`;
@@ -1396,6 +1389,7 @@ function ActionBtn({
   color: { bg: string; border: string; glow: string; activeBg: string };
   onClick?: () => void;
 }) {
+  const [hovered, setHovered] = useState(false);
   const displayCount = count !== undefined && count > 0
     ? count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count)
     : null;
@@ -1403,20 +1397,30 @@ function ActionBtn({
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 2,
-        background: active ? color.activeBg : color.bg,
-        border: `1px solid ${active ? color.border : "rgba(255,255,255,0.08)"}`,
-        borderRadius: 8,
+        gap: 3,
+        background: active
+          ? color.activeBg
+          : hovered
+            ? color.bg
+            : "rgba(255,255,255,0.04)",
+        border: `1px solid ${active ? color.border : hovered ? color.border : "rgba(255,255,255,0.1)"}`,
+        borderRadius: 10,
         cursor: "pointer",
-        padding: "7px 10px",
-        minWidth: 54,
-        transition: "all 0.2s",
-        boxShadow: active ? `0 3px 12px ${color.glow}` : "0 1px 3px rgba(0,0,0,0.3)",
+        padding: "8px 12px",
+        minWidth: 58,
+        transition: "all 0.18s ease",
+        boxShadow: active
+          ? `0 4px 14px ${color.glow}`
+          : hovered
+            ? `0 2px 8px ${color.glow}`
+            : "none",
         userSelect: "none",
         WebkitUserSelect: "none",
       }}
@@ -1426,7 +1430,7 @@ function ActionBtn({
         <span style={{
           fontSize: 11,
           fontWeight: 700,
-          color: active ? "#fff" : "rgba(255,255,255,0.85)",
+          color: active ? "#fff" : "rgba(255,255,255,0.9)",
           lineHeight: 1,
           userSelect: "none",
           WebkitUserSelect: "none",
@@ -1436,12 +1440,13 @@ function ActionBtn({
       )}
       <span className="play-action-btn-label" style={{
         fontSize: 8,
-        fontWeight: 700,
-        letterSpacing: "0.07em",
-        color: active ? "#fff" : "rgba(255,255,255,0.5)",
+        fontWeight: 600,
+        letterSpacing: "0.06em",
+        color: active ? "#fff" : hovered ? "#fff" : "rgba(255,255,255,0.45)",
         whiteSpace: "nowrap",
         userSelect: "none",
         WebkitUserSelect: "none",
+        transition: "color 0.18s",
       }}>
         {label}
       </span>
