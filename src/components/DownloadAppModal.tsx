@@ -3,15 +3,14 @@ import { X } from "lucide-react";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
-const DEFAULT_IMAGE = "/download-app-banner.png";
-const DEFAULT_LINK  = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
+const DEFAULT_LINK = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
 
 interface Props {
   onClose: () => void;
 }
 
 export default function DownloadAppModal({ onClose }: Props) {
-  const [bannerUrl, setBannerUrl] = useState(DEFAULT_IMAGE);
+  const [bannerUrl, setBannerUrl] = useState<string | null>(null);
   const [bannerLink, setBannerLink] = useState(DEFAULT_LINK);
 
   useEffect(() => {
@@ -91,21 +90,25 @@ export default function DownloadAppModal({ onClose }: Props) {
         </button>
 
         {/* Clicking the image goes to the configured link (APK download by default) */}
-        <a
-          href={bannerLink}
-          download={bannerLink.endsWith(".apk") ? "luofilm.apk" : undefined}
-          target={bannerLink.endsWith(".apk") ? undefined : "_blank"}
-          rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
-          style={{ display: "block", lineHeight: 0, cursor: "pointer" }}
-        >
-          <img
-            src={bannerUrl}
-            alt="Download LUOFILM App"
-            draggable={false}
-            style={{ width: "100%", height: "auto", display: "block" }}
-          />
-        </a>
+        {bannerUrl ? (
+          <a
+            href={bannerLink}
+            download={bannerLink.endsWith(".apk") ? "luofilm.apk" : undefined}
+            target={bannerLink.endsWith(".apk") ? undefined : "_blank"}
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            style={{ display: "block", lineHeight: 0, cursor: "pointer" }}
+          >
+            <img
+              src={bannerUrl}
+              alt="Download LUOFILM App"
+              draggable={false}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+          </a>
+        ) : (
+          <div style={{ width: "min(580px, 94vw)", height: 180, background: "#111" }} />
+        )}
       </div>
 
       <style>{`
