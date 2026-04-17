@@ -42,6 +42,7 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
   const internalRef = useRef<string>("");
   const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const subscriptionRef = useRef<string>("");
+  const activatedRef = useRef<boolean>(false);
 
   useEffect(() => {
     fbApi.settings.get().then((s: any) => {
@@ -77,6 +78,8 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
 
   const activateInFirebase = async (txData: any) => {
     if (!user) return;
+    if (activatedRef.current) return;
+    activatedRef.current = true;
     const expiresAt = Date.now() + plan.days * 24 * 60 * 60 * 1000;
     await fbApi.subscriptions.create({
       userId: user.uid,
@@ -162,6 +165,7 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
     }
 
     setPayStatus("pending");
+    activatedRef.current = false;
     const reference = `SUB-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     subscriptionRef.current = reference;
 
