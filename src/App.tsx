@@ -18,6 +18,7 @@ import DmcaPage from "./pages/DmcaPage";
 import GuidelinesPage from "./pages/GuidelinesPage";
 import ContactPage from "./pages/ContactPage";
 import AdminApp from "./admin/AdminApp";
+import OpenInAppBanner from "./components/OpenInAppBanner";
 
 function MainSite() {
   const [location] = useLocation();
@@ -26,6 +27,7 @@ function MainSite() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] mobile-pb">
       <Header />
+      <OpenInAppBanner />
       <MobileBottomNav />
       <Switch>
         <Route path="/" component={HomePage} />

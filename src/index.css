@@ -791,6 +791,10 @@ input, button, select, textarea {
     height: 54px !important;
   }
 
+  body.open-in-app-banner-visible .mobile-header-spacer {
+    height: 94px !important;
+  }
+
   /* Carousel */
   .carousel-mobile-full {
     width: 100% !important;
@@ -1307,6 +1311,10 @@ input, button, select, textarea {
 
   .mobile-header-spacer {
     height: 60px !important;
+  }
+
+  body.open-in-app-banner-visible .mobile-header-spacer {
+    height: 100px !important;
   }
 
   /* --- VIP modal --- */
