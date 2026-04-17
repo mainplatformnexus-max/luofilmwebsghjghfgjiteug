@@ -1,24 +1,15 @@
 import { useState, useEffect } from "react";
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "../lib/firebase";
 import { Smartphone, X } from "lucide-react";
 
 const STORAGE_KEY = "luofilm_open_in_app_dismissed";
-const DEFAULT_LINK = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
+const FALLBACK_URL = "https://luofilm.site";
 
 export default function OpenInAppBanner() {
   const [visible, setVisible] = useState(false);
-  const [appLink, setAppLink] = useState(DEFAULT_LINK);
 
   useEffect(() => {
     if (sessionStorage.getItem(STORAGE_KEY)) return;
-    getDoc(doc(db, "settings", "main")).then(snap => {
-      if (snap.exists()) {
-        const d = snap.data();
-        if (d.floatBannerLink) setAppLink(d.floatBannerLink);
-      }
-      setVisible(true);
-    }).catch(() => setVisible(true));
+    setVisible(true);
   }, []);
 
   useEffect(() => {
@@ -33,6 +24,14 @@ export default function OpenInAppBanner() {
   const dismiss = () => {
     sessionStorage.setItem(STORAGE_KEY, "1");
     setVisible(false);
+  };
+
+  const openInApp = () => {
+    window.location.href = "luofilm:///";
+    setTimeout(() => {
+      window.location.href = FALLBACK_URL;
+    }, 1500);
+    dismiss();
   };
 
   if (!visible) return null;
@@ -71,24 +70,20 @@ export default function OpenInAppBanner() {
         </span>
       </div>
 
-      <a
-        href={appLink}
-        download={appLink.endsWith(".apk") ? "luofilm.apk" : undefined}
-        target={appLink.endsWith(".apk") ? undefined : "_blank"}
-        rel="noopener noreferrer"
-        onClick={dismiss}
+      <button
+        onClick={openInApp}
         style={{
           display: "flex", alignItems: "center", gap: 5,
           background: "linear-gradient(135deg, #00a9f5, #0080c8)",
           color: "#fff", fontSize: 11, fontWeight: 700,
           padding: "5px 12px", borderRadius: 20,
-          textDecoration: "none", flexShrink: 0,
+          border: "none", cursor: "pointer", flexShrink: 0,
           letterSpacing: "0.04em", whiteSpace: "nowrap",
           boxShadow: "0 2px 10px rgba(0,169,245,0.35)",
         }}
       >
         Open in App
-      </a>
+      </button>
 
       <button
         onClick={dismiss}

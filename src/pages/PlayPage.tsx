@@ -764,14 +764,9 @@ export default function PlayPage() {
                     activeBg: "linear-gradient(135deg,#0080c8,#00a9f5)",
                   }}
                   onClick={() => {
-                    const deepLink = `luofilm://play/${params.id}`;
-                    const fallback = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
-                    const start = Date.now();
-                    window.location.href = deepLink;
+                    window.location.href = `luofilm:///play/${params.id}`;
                     setTimeout(() => {
-                      if (Date.now() - start < 2000) {
-                        window.location.href = fallback;
-                      }
+                      window.location.href = "https://luofilm.site";
                     }, 1500);
                   }}
                 />
