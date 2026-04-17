@@ -713,14 +713,9 @@ input, button, select, textarea {
   display: none !important;
 }
 
-/* Play page mobile action bar — hidden on desktop */
+/* Play page mobile action bar — hidden on desktop, inline on mobile */
 .play-mobile-action-bar {
   display: none;
-  position: fixed;
-  bottom: 60px;
-  left: 0;
-  right: 0;
-  z-index: 120;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -888,9 +883,18 @@ input, button, select, textarea {
   }
   .play-mobile-action-bar {
     display: flex !important;
+    position: static !important;
+    margin-top: 10px !important;
+    border-top: none !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 4px 0 !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
   }
   .play-main-layout {
-    padding: 0 8px 110px !important;
+    padding: 0 8px 20px !important;
     gap: 0 !important;
   }
   .play-title {
