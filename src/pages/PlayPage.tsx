@@ -747,14 +747,14 @@ export default function PlayPage() {
                   })()}
                 </div>
                 <ActionBtn
-                  icon={<img src="/luofilm-app-icon.png" alt="App" style={{ width: 22, height: 22, borderRadius: 5, objectFit: "cover", display: "block" }} />}
+                  icon={<img src="/luofilm-app-icon.png" alt="App" style={{ width: 30, height: 30, objectFit: "contain", display: "block", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))" }} />}
                   label="OPEN IN APP"
-                  active={false}
+                  active={true}
                   color={{
-                    bg: "rgba(204,0,204,0.08)",
+                    bg: "rgba(204,0,204,0.15)",
                     border: "#cc00cc",
-                    glow: "rgba(204,0,204,0.4)",
-                    activeBg: "linear-gradient(135deg,#9900cc,#cc00cc)",
+                    glow: "rgba(204,0,204,0.5)",
+                    activeBg: "linear-gradient(135deg,#6a00aa,#cc00cc,#e040fb)",
                   }}
                   onClick={() => {
                     window.location.href = `luofilm:///play/${params.id}`;
