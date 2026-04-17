@@ -747,7 +747,7 @@ export default function PlayPage() {
                   })()}
                 </div>
                 <ActionBtn
-                  icon={<img src="/luofilm-app-icon.png" alt="App" style={{ width: 30, height: 30, objectFit: "contain", display: "block", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))" }} />}
+                  icon={<img src="/luofilm-app-icon.png" alt="App" style={{ width: 22, height: 22, objectFit: "contain", display: "block", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))" }} />}
                   label="OPEN IN APP"
                   active={true}
                   color={{
