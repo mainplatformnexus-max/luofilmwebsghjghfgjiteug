@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Sparkles } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
 import { useSEO } from "../hooks/useSEO";
@@ -294,6 +294,7 @@ export default function HomePage() {
       )}
 
       <div style={{ padding: "8px 12px 40px" }}>
+        <SmartRecommender allShows={shows} />
         {shows.length > 0 && (
           <ContentRow title="ALL CONTENT" subtitle="RECENTLY ADDED" shows={shows.slice(0, 10)} categoryHref="/drama" />
         )}
@@ -469,6 +470,103 @@ function ContentRow({ title, subtitle, shows, categoryHref }: { title: string; s
           ) : (
             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginLeft: 2 }}>ALL &gt;</span>
           )}
+        </div>
+      </div>
+      <div ref={scrollRef} className="content-row-scroll" style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", paddingBottom: 4 }}>
+        {shows.map((show, idx) => <ContentCard key={show.id} show={show} rank={idx + 1} />)}
+      </div>
+    </section>
+  );
+}
+
+function SmartRecommender({ allShows }: { allShows: Show[] }) {
+  const [recShows, setRecShows] = useState<Show[]>([]);
+  const [basedOn, setBasedOn] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (!user) { setLoading(false); return; }
+      try {
+        const history = await fbApi.userActions.getHistory(user.uid);
+        if (!history.length) { setLoading(false); return; }
+
+        const lastWatched = history[0];
+        const watchedId: string = lastWatched.contentId;
+        const watchedTitle: string = lastWatched.contentTitle || "your last watch";
+
+        const watchedShow = allShows.find(s => s.id === watchedId);
+        const genre = watchedShow?.genre || "";
+        const type = watchedShow?.type || "";
+
+        const genres = genre.toLowerCase().split(/[·,]/).map((g: string) => g.trim()).filter(Boolean);
+
+        let recs = allShows.filter(s => {
+          if (s.id === watchedId) return false;
+          const sg = (s.genre || "").toLowerCase();
+          return genres.some((g: string) => g && sg.includes(g));
+        });
+
+        if (recs.length < 4) {
+          const typeRecs = allShows.filter(s => s.id !== watchedId && s.type === type && !recs.find(r => r.id === s.id));
+          recs = [...recs, ...typeRecs];
+        }
+
+        if (recs.length === 0) { setLoading(false); return; }
+
+        recs = recs.sort(() => Math.random() - 0.5).slice(0, 12);
+        setRecShows(recs);
+        setBasedOn(watchedTitle);
+      } catch {
+      } finally {
+        setLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [allShows]);
+
+  if (loading || recShows.length === 0) return null;
+
+  return (
+    <SmartRecommenderRow title={basedOn} shows={recShows} />
+  );
+}
+
+function SmartRecommenderRow({ title, shows }: { title: string; shows: Show[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scroll = (dir: "left" | "right") => {
+    if (scrollRef.current) scrollRef.current.scrollBy({ left: dir === "right" ? 280 : -280, behavior: "smooth" });
+  };
+
+  return (
+    <section className="content-row-section" style={{ marginBottom: 28 }}>
+      <div className="content-row-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flex: 1, minWidth: 0 }}>
+          <div style={{
+            flexShrink: 0, marginTop: 2,
+            width: 26, height: 26, borderRadius: "50%",
+            background: "linear-gradient(135deg,#a855f7,#6366f1)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 0 10px rgba(168,85,247,0.5)",
+          }}>
+            <Sparkles size={13} color="#fff" />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "#a855f7", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 2 }}>
+              BECAUSE YOU WATCHED
+            </div>
+            <div className="content-row-title" style={{ fontSize: 15, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {title}
+            </div>
+          </div>
+        </div>
+        <div className="content-row-nav" style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0, marginTop: 4 }}>
+          <button onClick={() => scroll("left")} style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <ChevronLeft size={12} />
+          </button>
+          <button onClick={() => scroll("right")} style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#a855f7", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+            <ChevronRight size={12} />
+          </button>
         </div>
       </div>
       <div ref={scrollRef} className="content-row-scroll" style={{ display: "flex", gap: 10, overflowX: "auto", scrollbarWidth: "none", msOverflowStyle: "none", paddingBottom: 4 }}>
