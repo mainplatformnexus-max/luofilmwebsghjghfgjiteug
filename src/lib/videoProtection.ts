@@ -19,8 +19,7 @@ const KNOWN_EXTENSION_GLOBALS: string[] = [
   "__sfh", "sfh_helper", "savefromHelper",
   "__videoDownloadHelper__", "vdhExt",
   "flashVideoDownloader", "idmGlobal",
-  "__IDM__", "downloadThisVideo",
-  "ytdl", "__ytdl", "getVideoInfo",
+  "__IDM__",
 ];
 
 const EXTENSION_SELECTORS = [
@@ -29,7 +28,6 @@ const EXTENSION_SELECTORS = [
   '[class*="video-dl"]', '[id*="video-dl"]',
   '[class*="ext-download"]', '[id*="ext-download"]',
   '[class*="flashvideo"]',
-  "a[download]",
 ];
 
 export function detectExtension(): boolean {
