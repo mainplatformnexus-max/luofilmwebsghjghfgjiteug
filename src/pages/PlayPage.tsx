@@ -554,48 +554,58 @@ export default function PlayPage() {
 
           {/* Mobile action buttons — shown below player on mobile only */}
           <div className="play-mobile-action-bar">
+            {/* Like */}
             <button
               className="play-mob-btn"
               onClick={handleLike}
               style={{
-                background: liked ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${liked ? "#3b82f6" : "rgba(255,255,255,0.12)"}`,
+                background: liked ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "rgba(59,130,246,0.08)",
+                border: `1px solid ${liked ? "#3b82f6" : "rgba(59,130,246,0.35)"}`,
               }}
             >
-              <ThumbsUp size={16} fill={liked ? "#fff" : "none"} color={liked ? "#fff" : "#60a5fa"} />
-              {likesCount > 0 && <span className="play-mob-count">{likesCount >= 1000 ? `${(likesCount/1000).toFixed(1)}k` : likesCount}</span>}
+              <ThumbsUp size={14} fill={liked ? "#fff" : "none"} color={liked ? "#fff" : "#60a5fa"} />
+              <span className="play-mob-label" style={{ color: liked ? "#fff" : "#60a5fa" }}>
+                {likeLoading ? "…" : liked ? "LIKED" : "LIKE"}{likesCount > 0 ? ` ${likesCount >= 1000 ? `${(likesCount/1000).toFixed(1)}k` : likesCount}` : ""}
+              </span>
             </button>
+            {/* Save */}
             <button
               className="play-mob-btn"
               onClick={handleSave}
               style={{
-                background: saved ? "linear-gradient(135deg,#db2777,#f472b6)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${saved ? "#f472b6" : "rgba(255,255,255,0.12)"}`,
+                background: saved ? "linear-gradient(135deg,#db2777,#f472b6)" : "rgba(244,114,182,0.08)",
+                border: `1px solid ${saved ? "#f472b6" : "rgba(244,114,182,0.35)"}`,
               }}
             >
-              <Heart size={16} fill={saved ? "#fff" : "none"} color={saved ? "#fff" : "#f472b6"} />
-              {savesCount > 0 && <span className="play-mob-count">{savesCount >= 1000 ? `${(savesCount/1000).toFixed(1)}k` : savesCount}</span>}
+              <Heart size={14} fill={saved ? "#fff" : "none"} color={saved ? "#fff" : "#f472b6"} />
+              <span className="play-mob-label" style={{ color: saved ? "#fff" : "#f472b6" }}>
+                {saveLoading ? "…" : saved ? "SAVED" : "SAVE"}{savesCount > 0 ? ` ${savesCount >= 1000 ? `${(savesCount/1000).toFixed(1)}k` : savesCount}` : ""}
+              </span>
             </button>
+            {/* Share */}
             <button
               className="play-mob-btn"
               onClick={handleShare}
               style={{
-                background: shareLabel === "COPIED!" ? "linear-gradient(135deg,#059669,#34d399)" : "rgba(255,255,255,0.06)",
-                border: `1px solid ${shareLabel === "COPIED!" ? "#34d399" : "rgba(255,255,255,0.12)"}`,
+                background: shareLabel === "COPIED!" ? "linear-gradient(135deg,#059669,#34d399)" : "rgba(52,211,153,0.08)",
+                border: `1px solid ${shareLabel === "COPIED!" ? "#34d399" : "rgba(52,211,153,0.35)"}`,
               }}
             >
-              <Share2 size={16} color={shareLabel === "COPIED!" ? "#fff" : "#34d399"} />
+              <Share2 size={14} color={shareLabel === "COPIED!" ? "#fff" : "#34d399"} />
+              <span className="play-mob-label" style={{ color: shareLabel === "COPIED!" ? "#fff" : "#34d399" }}>{shareLabel}</span>
             </button>
+            {/* Download */}
             <button
               className="play-mob-btn"
               onClick={() => { if (!isSubscribed) { setShowVIP(true); return; } setShowQualityPicker(!showQualityPicker); }}
               style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(251,146,60,0.08)",
+                border: "1px solid rgba(251,146,60,0.35)",
                 position: "relative",
               }}
             >
-              {isSubscribed ? <Download size={16} color="#fb923c" /> : <Lock size={16} color="#fb923c" />}
+              {isSubscribed ? <Download size={14} color="#fb923c" /> : <Lock size={14} color="#fb923c" />}
+              <span className="play-mob-label" style={{ color: "#fb923c" }}>DOWNLOAD</span>
               {showQualityPicker && isSubscribed && (() => {
                 const dlLinks = getDownloadLinks();
                 return (
@@ -630,6 +640,7 @@ export default function PlayPage() {
                 );
               })()}
             </button>
+            {/* Open in App */}
             <button
               className="play-mob-btn"
               onClick={() => { window.location.href = `luofilm:///play/${params.id}`; setTimeout(() => { window.location.href = "https://luofilm.site"; }, 1500); }}
@@ -638,7 +649,8 @@ export default function PlayPage() {
                 border: "1px solid #cc00cc",
               }}
             >
-              <img src="/luofilm-app-icon.png" alt="App" style={{ width: 18, height: 18, objectFit: "contain", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))" }} />
+              <img src="/luofilm-app-icon.png" alt="App" style={{ width: 14, height: 14, objectFit: "contain", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))", flexShrink: 0 }} />
+              <span className="play-mob-label">OPEN IN APP</span>
             </button>
           </div>
 
