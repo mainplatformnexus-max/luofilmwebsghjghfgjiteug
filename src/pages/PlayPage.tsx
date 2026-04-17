@@ -1359,6 +1359,103 @@ export default function PlayPage() {
       </div>
     </div>
 
+    {/* Mobile sticky action bar */}
+    <div className="play-mobile-action-bar">
+      {/* Like */}
+      <button
+        className="play-mob-btn"
+        onClick={handleLike}
+        style={{
+          background: liked ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "rgba(255,255,255,0.06)",
+          border: `1px solid ${liked ? "#3b82f6" : "rgba(255,255,255,0.12)"}`,
+        }}
+      >
+        <ThumbsUp size={16} fill={liked ? "#fff" : "none"} color={liked ? "#fff" : "#60a5fa"} />
+        {likesCount > 0 && <span className="play-mob-count">{likesCount >= 1000 ? `${(likesCount/1000).toFixed(1)}k` : likesCount}</span>}
+      </button>
+      {/* Save */}
+      <button
+        className="play-mob-btn"
+        onClick={handleSave}
+        style={{
+          background: saved ? "linear-gradient(135deg,#db2777,#f472b6)" : "rgba(255,255,255,0.06)",
+          border: `1px solid ${saved ? "#f472b6" : "rgba(255,255,255,0.12)"}`,
+        }}
+      >
+        <Heart size={16} fill={saved ? "#fff" : "none"} color={saved ? "#fff" : "#f472b6"} />
+        {savesCount > 0 && <span className="play-mob-count">{savesCount >= 1000 ? `${(savesCount/1000).toFixed(1)}k` : savesCount}</span>}
+      </button>
+      {/* Share */}
+      <button
+        className="play-mob-btn"
+        onClick={handleShare}
+        style={{
+          background: shareLabel === "COPIED!" ? "linear-gradient(135deg,#059669,#34d399)" : "rgba(255,255,255,0.06)",
+          border: `1px solid ${shareLabel === "COPIED!" ? "#34d399" : "rgba(255,255,255,0.12)"}`,
+        }}
+      >
+        <Share2 size={16} color={shareLabel === "COPIED!" ? "#fff" : "#34d399"} />
+      </button>
+      {/* Download */}
+      <button
+        className="play-mob-btn"
+        onClick={() => { if (!isSubscribed) { setShowVIP(true); return; } setShowQualityPicker(!showQualityPicker); }}
+        style={{
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          position: "relative",
+        }}
+      >
+        {isSubscribed
+          ? <Download size={16} color="#fb923c" />
+          : <Lock size={16} color="#fb923c" />}
+        {showQualityPicker && isSubscribed && (() => {
+          const dlLinks = getDownloadLinks();
+          return (
+            <>
+              <div style={{ position: "fixed", inset: 0, zIndex: 49 }} onClick={e => { e.stopPropagation(); setShowQualityPicker(false); }} />
+              <div style={{
+                position: "absolute", bottom: "calc(100% + 8px)", left: "50%",
+                transform: "translateX(-50%)", zIndex: 50,
+                background: "#1a1a2a", border: "1px solid rgba(251,146,60,0.3)",
+                borderRadius: 10, padding: "8px 6px",
+                boxShadow: "0 8px 30px rgba(0,0,0,0.6)",
+                minWidth: 160,
+              }}>
+                {dlLinks.length > 0 ? dlLinks.map(q => (
+                  <button key={q.key}
+                    onClick={e => { e.stopPropagation(); handleDownload(q.key, q.url); }}
+                    disabled={downloading}
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      width: "100%", padding: "8px 12px", borderRadius: 6,
+                      background: "transparent", border: "none", cursor: "pointer", gap: 12,
+                    }}
+                  >
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: "rgba(251,146,60,0.15)", color: "#fb923c" }}>{q.key}</span>
+                    <span style={{ fontSize: 12, color: "#fff", flex: 1, textAlign: "left" }}>{q.label}</span>
+                  </button>
+                )) : (
+                  <div style={{ padding: "10px 12px", fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center" }}>No download available</div>
+                )}
+              </div>
+            </>
+          );
+        })()}
+      </button>
+      {/* Open in App */}
+      <button
+        className="play-mob-btn"
+        onClick={() => { window.location.href = `luofilm:///play/${params.id}`; setTimeout(() => { window.location.href = "https://luofilm.site"; }, 1500); }}
+        style={{
+          background: "linear-gradient(135deg,#6a00aa,#cc00cc,#e040fb)",
+          border: "1px solid #cc00cc",
+        }}
+      >
+        <img src="/luofilm-app-icon.png" alt="App" style={{ width: 18, height: 18, objectFit: "contain", filter: "drop-shadow(0 1px 4px rgba(204,0,204,0.5))" }} />
+      </button>
+    </div>
+
     {showVIP && (
       <VIPModal
         onClose={() => setShowVIP(false)}

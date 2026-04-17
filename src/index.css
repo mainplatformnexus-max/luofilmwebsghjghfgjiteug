@@ -713,6 +713,47 @@ input, button, select, textarea {
   display: none !important;
 }
 
+/* Play page mobile action bar — hidden on desktop */
+.play-mobile-action-bar {
+  display: none;
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  z-index: 120;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(12,12,20,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.play-mob-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 22px;
+  cursor: pointer;
+  padding: 8px 16px;
+  min-width: 48px;
+  height: 38px;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+  position: relative;
+}
+.play-mob-btn:active {
+  opacity: 0.75;
+}
+.play-mob-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
 @media (max-width: 767px) {
   html, body, #root {
     overflow-x: hidden !important;
@@ -843,14 +884,13 @@ input, button, select, textarea {
     display: none !important;
   }
   .play-action-btns {
-    flex-wrap: wrap !important;
-    gap: 5px !important;
-  }
-  .play-action-btn-label {
     display: none !important;
   }
+  .play-mobile-action-bar {
+    display: flex !important;
+  }
   .play-main-layout {
-    padding: 0 8px 80px !important;
+    padding: 0 8px 110px !important;
     gap: 0 !important;
   }
   .play-title {
