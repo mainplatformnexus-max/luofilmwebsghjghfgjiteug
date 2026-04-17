@@ -7,9 +7,9 @@ import {
   Download,
   ThumbsUp,
   MessageSquare,
-  Check,
   Film,
   Lock,
+  Smartphone,
 } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
@@ -754,21 +754,25 @@ export default function PlayPage() {
                   })()}
                 </div>
                 <ActionBtn
-                  icon={subtitlesOn
-                    ? <Check size={14} color="#fff" />
-                    : <MessageSquare size={14} color="#c084fc" />}
-                  label={subtitlesOn ? "SUB ON" : "SUBTITLES"}
-                  active={subtitlesOn}
+                  icon={<Smartphone size={14} color="#00a9f5" />}
+                  label="OPEN IN APP"
+                  active={false}
                   color={{
-                    bg: "rgba(192,132,252,0.08)",
-                    border: "#c084fc",
-                    glow: "rgba(192,132,252,0.4)",
-                    activeBg: "linear-gradient(135deg,#7c3aed,#c084fc)",
+                    bg: "rgba(0,169,245,0.08)",
+                    border: "#00a9f5",
+                    glow: "rgba(0,169,245,0.4)",
+                    activeBg: "linear-gradient(135deg,#0080c8,#00a9f5)",
                   }}
                   onClick={() => {
-                    if (!hasSubtitles) { showToast("No subtitles available for this content"); return; }
-                    setSubtitlesOn(v => !v);
-                    showToast(subtitlesOn ? "Subtitles off" : "Subtitles on");
+                    const deepLink = `luofilm://play/${params.id}`;
+                    const fallback = "https://pub-4810ad32eae44d3db8b886164bf3650f.r2.dev/luofilm.apk";
+                    const start = Date.now();
+                    window.location.href = deepLink;
+                    setTimeout(() => {
+                      if (Date.now() - start < 2000) {
+                        window.location.href = fallback;
+                      }
+                    }, 1500);
                   }}
                 />
               </div>
