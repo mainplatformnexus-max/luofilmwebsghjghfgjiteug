@@ -1404,7 +1404,7 @@ function ActionBtn({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 2,
+        gap: 1,
         background: active
           ? color.activeBg
           : hovered
@@ -1413,9 +1413,9 @@ function ActionBtn({
         border: `1px solid ${active ? color.border : hovered ? color.border : "rgba(255,255,255,0.1)"}`,
         borderRadius: 10,
         cursor: "pointer",
-        padding: 0,
-        width: 62,
-        height: 56,
+        padding: "0 10px",
+        minWidth: 64,
+        height: 44,
         flexShrink: 0,
         transition: "background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease",
         boxShadow: active
@@ -1434,7 +1434,7 @@ function ActionBtn({
         fontWeight: 700,
         color: active ? "#fff" : "rgba(255,255,255,0.9)",
         lineHeight: 1,
-        minHeight: 13,
+        minHeight: 11,
         userSelect: "none",
         WebkitUserSelect: "none",
       }}>
