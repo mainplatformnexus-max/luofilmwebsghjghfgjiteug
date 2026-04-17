@@ -552,101 +552,8 @@ export default function PlayPage() {
             </div>
           )}
 
-          {/* Show title + meta */}
-          <div style={{ marginTop: 14 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                gap: 12,
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                  {isVip && (
-                    <span
-                      style={{
-                        padding: "1px 8px",
-                        borderRadius: 2,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        background: "linear-gradient(90deg,#ffc552,#ffdd9a)",
-                        color: "#4e2d03",
-                      }}
-                    >
-                      VIP
-                    </span>
-                  )}
-                  {!isSeries && (
-                    <span
-                      style={{
-                        padding: "1px 8px",
-                        borderRadius: 2,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        background: "rgba(255,255,255,0.1)",
-                        color: "rgba(255,255,255,0.7)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                      }}
-                    >
-                      <Film size={10} />
-                      MOVIE
-                    </span>
-                  )}
-                  <h1 className="play-title" style={{ fontSize: 20, fontWeight: 700, color: "#fff", margin: 0 }}>
-                    {show.title}
-                  </h1>
-                </div>
-                <div
-                  className="play-meta"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    marginTop: 8,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                    <Star size={13} fill="#ffc552" color="#ffc552" />
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#ffc552" }}>
-                      {show.rating}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-                    {show.year}
-                  </span>
-                  {isSeries && (
-                    <>
-                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
-                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
-                        {show.episodeCount} EPS
-                      </span>
-                    </>
-                  )}
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
-                  {show.genre.split(" · ").map((g) => (
-                    <span
-                      key={g}
-                      style={{
-                        fontSize: 11,
-                        color: "#00a9f5",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {g}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action buttons */}
-              <div className="play-action-btns" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {/* Action buttons - directly under player */}
+          <div className="play-action-btns" style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                 <ActionBtn
                   icon={<ThumbsUp size={14} fill={liked ? "#fff" : "none"} color={liked ? "#fff" : "#60a5fa"} />}
                   label={likeLoading ? "…" : liked ? "LIKED" : "LIKE"}
@@ -764,6 +671,92 @@ export default function PlayPage() {
                   }}
                 />
               </div>
+
+          {/* Show title + meta */}
+          <div style={{ marginTop: 14 }}>
+            <div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  {isVip && (
+                    <span
+                      style={{
+                        padding: "1px 8px",
+                        borderRadius: 2,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        background: "linear-gradient(90deg,#ffc552,#ffdd9a)",
+                        color: "#4e2d03",
+                      }}
+                    >
+                      VIP
+                    </span>
+                  )}
+                  {!isSeries && (
+                    <span
+                      style={{
+                        padding: "1px 8px",
+                        borderRadius: 2,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        background: "rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.7)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 3,
+                      }}
+                    >
+                      <Film size={10} />
+                      MOVIE
+                    </span>
+                  )}
+                  <h1 className="play-title" style={{ fontSize: 20, fontWeight: 700, color: "#fff", margin: 0 }}>
+                    {show.title}
+                  </h1>
+                </div>
+                <div
+                  className="play-meta"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    marginTop: 8,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <Star size={13} fill="#ffc552" color="#ffc552" />
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#ffc552" }}>
+                      {show.rating}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+                    {show.year}
+                  </span>
+                  {isSeries && (
+                    <>
+                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
+                      <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+                        {show.episodeCount} EPS
+                      </span>
+                    </>
+                  )}
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>|</span>
+                  {show.genre.split(" · ").map((g) => (
+                    <span
+                      key={g}
+                      style={{
+                        fontSize: 11,
+                        color: "#00a9f5",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
 
