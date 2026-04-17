@@ -148,6 +148,11 @@ export default function PlayPage() {
     setSavesCount(0);
     fbApi.publicContent.getById(params.id).then((d) => {
       if (d) {
+        try {
+          localStorage.setItem("lf_last_clicked_show", JSON.stringify({
+            id: d.id, title: d.title || "", genre: d.genre || "", type: d.type || "",
+          }));
+        } catch {}
         setShow(toShow(d));
         setRawData(d);
         setLikesCount(Number(d.likesCount) || 0);

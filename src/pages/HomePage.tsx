@@ -332,7 +332,7 @@ export default function HomePage() {
 function SideShowCard({ show }: { show: Show }) {
   return (
     <Link href={`/play/${show.id}`}>
-      <div style={{ position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a", cursor: "pointer" }}>
+      <div onClick={() => saveLastClickedShow(show)} style={{ position: "relative", borderRadius: 6, overflow: "hidden", background: "#1a1a1a", cursor: "pointer" }}>
         <div style={{ paddingTop: "56.25%" }} />
         <img src={show.thumbnailUrl} alt={show.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }} />
         {show.badge && show.badge !== "none" && (
@@ -353,6 +353,7 @@ function MiniShowCard({ show }: { show: Show }) {
   return (
     <Link href={`/play/${show.id}`}>
       <div
+        onClick={() => saveLastClickedShow(show)}
         style={{ display: "flex", gap: 8, alignItems: "center", padding: "4px 6px", borderRadius: 4, cursor: "pointer", transition: "background 0.2s" }}
         onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)"; }}
         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
@@ -479,44 +480,71 @@ function ContentRow({ title, subtitle, shows, categoryHref }: { title: string; s
   );
 }
 
+function getLastClickedShow(): { id: string; title: string; genre: string; type: string } | null {
+  try {
+    const raw = localStorage.getItem("lf_last_clicked_show");
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveLastClickedShow(show: { id: string; title: string; genre?: string; type?: string }) {
+  try {
+    localStorage.setItem("lf_last_clicked_show", JSON.stringify({
+      id: show.id,
+      title: show.title,
+      genre: show.genre || "",
+      type: show.type || "",
+    }));
+  } catch {}
+}
+
+function buildRecs(allShows: Show[], sourceId: string, sourceGenre: string, sourceType: string): Show[] {
+  const genres = sourceGenre.toLowerCase().split(/[·,]/).map((g: string) => g.trim()).filter(Boolean);
+  let recs = allShows.filter(s => {
+    if (s.id === sourceId) return false;
+    const sg = (s.genre || "").toLowerCase();
+    return genres.some((g: string) => g && sg.includes(g));
+  });
+  if (recs.length < 4) {
+    const typeRecs = allShows.filter(s => s.id !== sourceId && s.type === sourceType && !recs.find(r => r.id === s.id));
+    recs = [...recs, ...typeRecs];
+  }
+  return recs.sort(() => Math.random() - 0.5).slice(0, 12);
+}
+
 function SmartRecommender({ allShows }: { allShows: Show[] }) {
   const [recShows, setRecShows] = useState<Show[]>([]);
   const [basedOn, setBasedOn] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (allShows.length === 0) return;
+
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (!user) { setLoading(false); return; }
       try {
-        const history = await fbApi.userActions.getHistory(user.uid);
-        if (!history.length) { setLoading(false); return; }
-
-        const lastWatched = history[0];
-        const watchedId: string = lastWatched.contentId;
-        const watchedTitle: string = lastWatched.contentTitle || "your last watch";
-
-        const watchedShow = allShows.find(s => s.id === watchedId);
-        const genre = watchedShow?.genre || "";
-        const type = watchedShow?.type || "";
-
-        const genres = genre.toLowerCase().split(/[·,]/).map((g: string) => g.trim()).filter(Boolean);
-
-        let recs = allShows.filter(s => {
-          if (s.id === watchedId) return false;
-          const sg = (s.genre || "").toLowerCase();
-          return genres.some((g: string) => g && sg.includes(g));
-        });
-
-        if (recs.length < 4) {
-          const typeRecs = allShows.filter(s => s.id !== watchedId && s.type === type && !recs.find(r => r.id === s.id));
-          recs = [...recs, ...typeRecs];
+        if (user) {
+          const history = await fbApi.userActions.getHistory(user.uid);
+          if (history.length) {
+            const last = history[0];
+            const watchedId: string = last.contentId;
+            const watchedShow = allShows.find(s => s.id === watchedId);
+            const recs = buildRecs(allShows, watchedId, watchedShow?.genre || "", watchedShow?.type || "");
+            if (recs.length > 0) {
+              setRecShows(recs);
+              setBasedOn(last.contentTitle || watchedShow?.title || "your last watch");
+              return;
+            }
+          }
         }
-
-        if (recs.length === 0) { setLoading(false); return; }
-
-        recs = recs.sort(() => Math.random() - 0.5).slice(0, 12);
-        setRecShows(recs);
-        setBasedOn(watchedTitle);
+        const clicked = getLastClickedShow();
+        if (clicked) {
+          const clickedShow = allShows.find(s => s.id === clicked.id) || clicked;
+          const recs = buildRecs(allShows, clicked.id, (clickedShow as any).genre || clicked.genre, (clickedShow as any).type || clicked.type);
+          if (recs.length > 0) {
+            setRecShows(recs);
+            setBasedOn(clicked.title);
+          }
+        }
       } catch {
       } finally {
         setLoading(false);
@@ -579,6 +607,7 @@ function SmartRecommenderRow({ title, shows }: { title: string; shows: Show[] })
 function ContentCard({ show, rank }: { show: Show; rank: number }) {
   const [hovered, setHovered] = useState(false);
   function handleClick() {
+    saveLastClickedShow(show);
     const cu = auth.currentUser;
     fbApi.activities.log({
       userId: cu?.uid || null,
