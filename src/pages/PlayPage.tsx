@@ -1404,7 +1404,7 @@ function ActionBtn({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 3,
+        gap: 2,
         background: active
           ? color.activeBg
           : hovered
@@ -1413,9 +1413,11 @@ function ActionBtn({
         border: `1px solid ${active ? color.border : hovered ? color.border : "rgba(255,255,255,0.1)"}`,
         borderRadius: 10,
         cursor: "pointer",
-        padding: "8px 12px",
-        minWidth: 58,
-        transition: "all 0.18s ease",
+        padding: 0,
+        width: 62,
+        height: 56,
+        flexShrink: 0,
+        transition: "background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease",
         boxShadow: active
           ? `0 4px 14px ${color.glow}`
           : hovered
@@ -1423,21 +1425,21 @@ function ActionBtn({
             : "none",
         userSelect: "none",
         WebkitUserSelect: "none",
+        overflow: "hidden",
       }}
     >
       {icon}
-      {displayCount !== null && (
-        <span style={{
-          fontSize: 11,
-          fontWeight: 700,
-          color: active ? "#fff" : "rgba(255,255,255,0.9)",
-          lineHeight: 1,
-          userSelect: "none",
-          WebkitUserSelect: "none",
-        }}>
-          {displayCount}
-        </span>
-      )}
+      <span style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: active ? "#fff" : "rgba(255,255,255,0.9)",
+        lineHeight: 1,
+        minHeight: 13,
+        userSelect: "none",
+        WebkitUserSelect: "none",
+      }}>
+        {displayCount ?? ""}
+      </span>
       <span className="play-action-btn-label" style={{
         fontSize: 8,
         fontWeight: 600,
