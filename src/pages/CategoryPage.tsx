@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
 import { useSEO } from "../hooks/useSEO";
+import { filterPublicVisible, useIsDistro } from "../lib/distros";
 
 interface CategoryPageProps {
   genre: string;
@@ -130,10 +131,13 @@ export default function CategoryPage({ genre, title, description: _description }
     }).catch(() => {});
   }, [genre]);
 
+  const isDistro = useIsDistro();
+
   useEffect(() => {
     fbApi.publicContent.listAll()
       .then((docs) => {
-        const all = docs.map(toShow);
+        const visibleDocs = filterPublicVisible(docs as any[], isDistro);
+        const all = visibleDocs.map(toShow);
         if (genre === "movie") {
           // Movies page: all content with type "movie"
           setShows(all.filter(s => s.type === "movie"));
@@ -156,7 +160,7 @@ export default function CategoryPage({ genre, title, description: _description }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [genre]);
+  }, [genre, isDistro]);
 
   if (loading) {
     return (

@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { User, Clock, Bookmark, Download, LogOut, Smartphone } from "lucide-react";
+import { User, Clock, Bookmark, Download, LogOut, Smartphone, Truck } from "lucide-react";
 import VIPModal from "./VIPModal";
 import AuthModal from "./AuthModal";
 import DownloadAppModal from "./DownloadAppModal";
 import { useAuth } from "../contexts/AuthContext";
-
-const ADMIN_EMAILS = ["mainplatform.nexus@gmail.com"];
+import { checkIsDistro, ADMIN_EMAILS } from "../lib/distros";
 
 const navLinks = [
   { label: "HOME", path: "/" },
@@ -34,6 +33,7 @@ export default function Header() {
   }, []);
 
   const { user, profile, logout } = useAuth();
+  const isDistro = checkIsDistro(user, profile);
 
   async function handleLogout() {
     await logout();
@@ -224,6 +224,24 @@ export default function Header() {
               </span>
               <span className="header-action-label"><span className="desktop-only" style={{ display: "inline" }}>JOIN </span>VIP</span>
             </button>
+
+            {/* Distros link */}
+            {isDistro && (
+              <Link href="/distros">
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 5, padding: "0 10px", height: 28, borderRadius: 6,
+                  background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.45)",
+                  color: "#fbbf24", fontSize: 11, fontWeight: 700, cursor: "pointer", flexShrink: 0,
+                  letterSpacing: "0.05em", marginLeft: 4,
+                }}
+                  className="header-distros-button"
+                  title="Distros — distributor area"
+                >
+                  <Truck size={12} />
+                  <span className="desktop-only" style={{ display: "inline" }}>DISTROS</span>
+                </div>
+              </Link>
+            )}
 
             {/* Admin link */}
             {user && ADMIN_EMAILS.includes(user.email || "") && (

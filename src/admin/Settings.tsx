@@ -20,10 +20,9 @@ const DEFAULT_SETTINGS = {
   userRegistration: true,
   emailVerification: false,
   freeTrialDays: 7,
-  plan1DayPrice: 2500,
-  plan3DaysPrice: 5000,
   plan1WeekPrice: 10000,
-  plan1MonthPrice: 20000,
+  plan1MonthPrice: 30000,
+  plan3MonthsPrice: 75000,
   maxDevices: 3,
   watermarkEnabled: true,
   analyticsEnabled: true,
@@ -78,10 +77,9 @@ function Toggle({ checked, onChange, label, hint }: any) {
 }
 
 const VIP_PLANS = [
-  { key: "plan1DayPrice", label: "1 Day Pass", tag: "TRY IT", tagColor: "#888" },
-  { key: "plan3DaysPrice", label: "3 Days Pass", tag: "POPULAR", tagColor: "#f5a623" },
-  { key: "plan1WeekPrice", label: "1 Week Pass", tag: "GREAT VALUE", tagColor: "#e05a7a" },
-  { key: "plan1MonthPrice", label: "1 Month Pass", tag: "BEST DEAL", tagColor: "#059669" },
+  { key: "plan1WeekPrice", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888" },
+  { key: "plan1MonthPrice", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623" },
+  { key: "plan3MonthsPrice", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669" },
 ];
 
 export default function Settings() {
@@ -209,7 +207,7 @@ export default function Settings() {
             🇺🇬 All plans priced in <strong>UGX (Ugandan Shilling)</strong> — changes here update the VIP modal prices in real time
           </span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
           {VIP_PLANS.map(p => (
             <div key={p.key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: 14, position: "relative" }}>
               <div style={{ position: "absolute", top: -1, left: -1, background: p.tagColor, color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: "9px 0 9px 0", letterSpacing: "0.04em" }}>{p.tag}</div>

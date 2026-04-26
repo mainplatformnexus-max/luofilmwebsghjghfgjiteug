@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Play, Sparkles } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
 import { auth } from "../lib/firebase";
 import { useSEO } from "../hooks/useSEO";
+import { filterPublicVisible, useIsDistro } from "../lib/distros";
 
 interface Show {
   id: string;
@@ -86,6 +87,7 @@ export default function HomePage() {
   const [secondaryShows, setSecondaryShows] = useState<Show[]>([]);
   const [featuredShows, setFeaturedShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
+  const isDistro = useIsDistro();
 
   useEffect(() => {
     const cu = auth.currentUser;
@@ -106,7 +108,8 @@ export default function HomePage() {
       fbApi.publicContent.getHomeFeatured(),
     ])
       .then(([contentDocs, carouselItems, secondaryItems, featuredItems]) => {
-        const allShows = contentDocs.map(toShow);
+        const visibleDocs = filterPublicVisible(contentDocs as any[], isDistro);
+        const allShows = visibleDocs.map(toShow);
         setShows(allShows);
 
         const contentMap = new Map<string, Show>(allShows.map(s => [s.id, s]));
@@ -152,7 +155,7 @@ export default function HomePage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [isDistro]);
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);

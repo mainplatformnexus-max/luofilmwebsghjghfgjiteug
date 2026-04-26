@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import HistoryPage from "./pages/HistoryPage";
 import WatchlistPage from "./pages/WatchlistPage";
 import DownloadsPage from "./pages/DownloadsPage";
+import DistrosPage from "./pages/DistrosPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import CookiesPage from "./pages/CookiesPage";
@@ -36,6 +37,7 @@ function MainSite() {
         <Route path="/history" component={HistoryPage} />
         <Route path="/watchlist" component={WatchlistPage} />
         <Route path="/downloads" component={DownloadsPage} />
+        <Route path="/distros" component={DistrosPage} />
         <Route path="/play/:id" component={PlayPage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/privacy" component={PrivacyPage} />

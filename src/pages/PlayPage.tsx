@@ -127,10 +127,9 @@ export default function PlayPage() {
     fbApi.settings.get().then((s: any) => {
       if (!s) return;
       const prices = [
-        Number(s.plan1DayPrice ?? 2500),
-        Number(s.plan3DaysPrice ?? 5000),
         Number(s.plan1WeekPrice ?? 10000),
-        Number(s.plan1MonthPrice ?? 20000),
+        Number(s.plan1MonthPrice ?? 30000),
+        Number(s.plan3MonthsPrice ?? 75000),
       ].filter(Boolean);
       setMinPlanPrice(Math.min(...prices));
     }).catch(() => {});

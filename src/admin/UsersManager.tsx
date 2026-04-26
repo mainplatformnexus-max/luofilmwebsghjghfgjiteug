@@ -136,6 +136,7 @@ function UserForm({ initial, onSave, onClose }: any) {
           <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5, fontWeight: 600 }}>Role</label>
           <select style={inp} value={form.role} onChange={e => set("role", e.target.value)}>
             <option value="user">User</option>
+            <option value="distro">Distributor</option>
             <option value="admin">Admin</option>
           </select>
         </div>

@@ -4,10 +4,9 @@ import { paymentApi, PaymentStatus } from "../lib/paymentApi";
 import { useAuth } from "../contexts/AuthContext";
 
 const DEFAULT_PLANS = [
-  { id: "day1", label: "1 Day Pass", tag: "TRY IT", tagColor: "#888", price: 2500, days: 1 },
-  { id: "day3", label: "3 Days Pass", tag: "POPULAR", tagColor: "#f5a623", price: 5000, days: 3 },
-  { id: "week1", label: "1 Week Pass", tag: "GREAT VALUE", tagColor: "#e05a7a", price: 10000, days: 7 },
-  { id: "month1", label: "1 Month Pass", tag: "BEST DEAL", tagColor: "#059669", price: 20000, days: 30 },
+  { id: "week1", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888", price: 10000, days: 7 },
+  { id: "month1", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623", price: 30000, days: 30 },
+  { id: "months3", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669", price: 75000, days: 90 },
 ];
 
 const BENEFITS = [
@@ -31,7 +30,7 @@ interface VIPModalProps {
 
 export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModalProps) {
   const { user, profile } = useAuth();
-  const [selectedPlan, setSelectedPlan] = useState("day3");
+  const [selectedPlan, setSelectedPlan] = useState("month1");
   const [plans, setPlans] = useState(DEFAULT_PLANS);
   const [plansLoaded, setPlansLoaded] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -48,10 +47,9 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
     fbApi.settings.get().then((s: any) => {
       if (s) {
         setPlans([
-          { id: "day1", label: "1 Day Pass", tag: "TRY IT", tagColor: "#888", price: Number(s.plan1DayPrice ?? 2500), days: 1 },
-          { id: "day3", label: "3 Days Pass", tag: "POPULAR", tagColor: "#f5a623", price: Number(s.plan3DaysPrice ?? 5000), days: 3 },
-          { id: "week1", label: "1 Week Pass", tag: "GREAT VALUE", tagColor: "#e05a7a", price: Number(s.plan1WeekPrice ?? 10000), days: 7 },
-          { id: "month1", label: "1 Month Pass", tag: "BEST DEAL", tagColor: "#059669", price: Number(s.plan1MonthPrice ?? 20000), days: 30 },
+          { id: "week1", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888", price: Number(s.plan1WeekPrice ?? 10000), days: 7 },
+          { id: "month1", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623", price: Number(s.plan1MonthPrice ?? 30000), days: 30 },
+          { id: "months3", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669", price: Number(s.plan3MonthsPrice ?? 75000), days: 90 },
         ]);
       }
     }).catch(() => {}).finally(() => setPlansLoaded(true));

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Star } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
+import { filterPublicVisible, useIsDistro } from "../lib/distros";
 
 interface Show {
   id: string;
@@ -74,14 +75,16 @@ export default function SearchPage() {
   const query = new URLSearchParams(window.location.search).get("q") || "";
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(true);
+  const isDistro = useIsDistro();
 
   useEffect(() => {
     if (!query.trim()) { setLoading(false); return; }
     setLoading(true);
     fbApi.publicContent.listAll()
       .then((docs) => {
+        const visibleDocs = filterPublicVisible(docs as any[], isDistro);
         const q = query.toLowerCase();
-        const filtered = docs
+        const filtered = visibleDocs
           .map(toShow)
           .filter(s =>
             s.title.toLowerCase().includes(q) ||
@@ -91,7 +94,7 @@ export default function SearchPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [query]);
+  }, [query, isDistro]);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
