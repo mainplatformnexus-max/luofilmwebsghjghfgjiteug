@@ -1,7 +1,5 @@
 import { Link, useLocation } from "wouter";
 import { Truck } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { checkIsDistro } from "../lib/distros";
 
 function HomeIcon({ active }: { active: boolean }) {
   return active ? (
@@ -98,22 +96,17 @@ function DistrosIcon({ active }: { active: boolean }) {
   );
 }
 
-const baseNavItems = [
+const navItems = [
   { label: "Home",    path: "/",        Icon: HomeIcon },
   { label: "Drama",   path: "/drama",   Icon: DramaIcon },
   { label: "Movies",  path: "/movie",   Icon: MovieIcon },
   { label: "Variety", path: "/variety", Icon: VarietyIcon },
   { label: "Anime",   path: "/anime",   Icon: AnimeIcon },
+  { label: "Distros", path: "/distros", Icon: DistrosIcon },
 ];
 
 export default function MobileBottomNav() {
   const [location] = useLocation();
-  const { user, profile } = useAuth();
-  const isDistro = checkIsDistro(user, profile);
-
-  const navItems = isDistro
-    ? [...baseNavItems.slice(0, 4), { label: "Distros", path: "/distros", Icon: DistrosIcon }]
-    : baseNavItems;
 
   return (
     <nav className="mobile-bottom-nav">

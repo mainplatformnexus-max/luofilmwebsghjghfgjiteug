@@ -275,6 +275,48 @@ export const fbApi = {
         return expiresAt > now;
       });
     },
+    checkActivePlan: async (userId: string, planId: string): Promise<boolean> => {
+      if (!userId || !planId) return false;
+      const snap = await getDocs(
+        query(
+          collection(db, "subscriptions"),
+          where("userId", "==", userId),
+          where("status", "==", "active"),
+          where("plan", "==", planId)
+        )
+      );
+      const now = Date.now();
+      return snap.docs.some((d) => {
+        const data = d.data();
+        const expiresAt = data.expiresAt instanceof Timestamp
+          ? data.expiresAt.toMillis()
+          : (typeof data.expiresAt === "number" ? data.expiresAt : 0);
+        return expiresAt > now;
+      });
+    },
+    getActiveByPlan: async (userId: string, planId: string): Promise<any | null> => {
+      if (!userId || !planId) return null;
+      const snap = await getDocs(
+        query(
+          collection(db, "subscriptions"),
+          where("userId", "==", userId),
+          where("status", "==", "active"),
+          where("plan", "==", planId)
+        )
+      );
+      const now = Date.now();
+      let best: any = null;
+      snap.docs.forEach((d) => {
+        const data = d.data();
+        const expiresAt = data.expiresAt instanceof Timestamp
+          ? data.expiresAt.toMillis()
+          : (typeof data.expiresAt === "number" ? data.expiresAt : 0);
+        if (expiresAt > now && (!best || expiresAt > best.expiresAt)) {
+          best = { id: d.id, ...data, expiresAt };
+        }
+      });
+      return best;
+    },
   },
 
   wallet: {
@@ -347,6 +389,11 @@ export const fbApi = {
     delete: async (id: string) => {
       await deleteDoc(doc(db, "activities", id));
       return { id };
+    },
+    deleteAll: async () => {
+      const snap = await getDocs(collection(db, "activities"));
+      await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+      return { deleted: snap.docs.length };
     },
     log: async (data: any) => {
       const ip = await getClientIp();

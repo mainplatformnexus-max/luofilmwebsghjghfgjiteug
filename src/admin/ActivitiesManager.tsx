@@ -119,6 +119,29 @@ export default function ActivitiesManager() {
     await buildActivityPDF(filtered, period);
   };
 
+  const [clearing, setClearing] = useState(false);
+  const handleClearAll = async () => {
+    if (activities.length === 0) return;
+    const ok = window.confirm(
+      `Permanently delete ALL activity records?\n\nThis will remove ${activities.length}+ entries from the activity log and cannot be undone.`
+    );
+    if (!ok) return;
+    const ok2 = window.confirm("Are you absolutely sure? This action is irreversible.");
+    if (!ok2) return;
+    setClearing(true);
+    try {
+      const res: any = await api.activities.deleteAll();
+      const removed = res?.deleted ?? "all";
+      setActivities([]);
+      window.alert(`Cleared ${removed} activity records.`);
+      load();
+    } catch (e: any) {
+      window.alert("Failed to clear activities: " + (e?.message || "unknown error"));
+    } finally {
+      setClearing(false);
+    }
+  };
+
   const actionCounts = activities.reduce((acc, a) => {
     acc[a.actionType] = (acc[a.actionType] || 0) + 1;
     return acc;
@@ -137,6 +160,27 @@ export default function ActivitiesManager() {
             {autoRefresh ? "● Live" : "Auto-Refresh"}
           </button>
           <button onClick={load} style={{ padding: "8px 14px", background: "rgba(255,255,255,0.06)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontSize: 13, cursor: "pointer" }}>Refresh</button>
+          <button
+            onClick={handleClearAll}
+            disabled={clearing || activities.length === 0}
+            title="Permanently delete all activity records"
+            style={{
+              padding: "8px 14px",
+              background: clearing || activities.length === 0 ? "rgba(239,68,68,0.12)" : "rgba(239,68,68,0.18)",
+              color: "#f87171",
+              border: "1px solid rgba(239,68,68,0.4)",
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: clearing || activities.length === 0 ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              opacity: activities.length === 0 ? 0.55 : 1,
+            }}
+          >
+            <Trash2 size={14} /> {clearing ? "Clearing…" : "Clear All"}
+          </button>
           <div style={{ position: "relative" }}>
             <button onClick={() => setExportDropdown(!exportDropdown)} style={{ padding: "8px 16px", background: "#10b981", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
               <Download size={14} /> Export PDF <ChevronDown size={13} />

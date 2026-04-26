@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS = {
   plan1WeekPrice: 10000,
   plan1MonthPrice: 30000,
   plan3MonthsPrice: 75000,
+  planDistrosPrice: 50000,
   maxDevices: 3,
   watermarkEnabled: true,
   analyticsEnabled: true,
@@ -81,6 +82,8 @@ const VIP_PLANS = [
   { key: "plan1MonthPrice", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623" },
   { key: "plan3MonthsPrice", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669" },
 ];
+
+const DISTROS_PLAN = { key: "planDistrosPrice", label: "Distros Pass — 1 Month", tag: "DISTROS", tagColor: "#f59e0b", days: 30 };
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
@@ -228,6 +231,30 @@ export default function Settings() {
               </div>
             </div>
           ))}
+        </div>
+        <div style={{ marginTop: 4, marginBottom: 18, padding: "12px 14px", background: "rgba(245,158,11,0.06)", borderRadius: 10, border: "1px solid rgba(245,158,11,0.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" as const }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(245,158,11,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fbbf24", fontWeight: 800 }}>D</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fbbf24" }}>{DISTROS_PLAN.label}</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>
+                  Separate distributor membership — gives early access to new uploads in the Distros area
+                </div>
+              </div>
+            </div>
+            <div style={{ position: "relative", width: 200 }}>
+              <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 600 }}>UGX</span>
+              <input
+                style={{ ...inp, paddingLeft: 42, fontWeight: 700, fontSize: 15, color: "#fbbf24" }}
+                type="number"
+                step="100"
+                min="0"
+                value={(settings as any)[DISTROS_PLAN.key] ?? 50000}
+                onChange={e => set(DISTROS_PLAN.key, Number(e.target.value))}
+              />
+            </div>
+          </div>
         </div>
         <Field label="Free Trial (Days)">
           <input style={{ ...inp, width: 120 }} type="number" value={settings.freeTrialDays} onChange={e => set("freeTrialDays", Number(e.target.value))} />

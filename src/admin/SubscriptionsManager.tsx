@@ -12,6 +12,7 @@ const PLANS = [
   { id: "week1", label: "1 Week Pass", days: 7, price: 10000 },
   { id: "month1", label: "1 Month Pass", days: 30, price: 30000 },
   { id: "months3", label: "3 Months Pass", days: 90, price: 75000 },
+  { id: "distros", label: "Distros — 1 Month", days: 30, price: 50000 },
 ];
 
 const PLAN_MAP: Record<string, { label: string; days: number; price: number }> = Object.fromEntries(PLANS.map(p => [p.id, p]));
