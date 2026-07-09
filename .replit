@@ -1,18 +1,11 @@
 modules = ["web", "nodejs-20"]
 
-[[artifacts]]
-id = "artifacts/api-server"
-
-[[artifacts]]
-id = "artifacts/mockup-sandbox"
+[[ports]]
+localPort = 5000
+externalPort = 80
 
 [deployment]
-router = "application"
 deploymentTarget = "autoscale"
-
-[deployment.postBuild]
-args = ["pnpm", "store", "prune"]
-env = { "CI" = "true" }
 
 [workflows]
 runButton = "Project"
