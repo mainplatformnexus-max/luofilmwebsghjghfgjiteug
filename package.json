@@ -79,5 +79,10 @@
     "jspdf-autotable": "^5.0.7",
     "pg": "^8.20.0",
     "qrcode.react": "^4.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "protobufjs": "7.6.5"
+    }
   }
 }
