@@ -5,7 +5,6 @@ import { fbApi } from "../lib/firebaseApi";
 import { useAuth } from "../contexts/AuthContext";
 import {
   isDistroExclusive,
-  isInDistrosWindow,
   timeLeftLabel,
   useIsDistroSubscriber,
   useIsDistroOperator,
@@ -145,13 +144,12 @@ export default function DistrosPage() {
   useEffect(() => {
     if (!hasAccess) { setLoading(false); return; }
     setLoading(true);
-    fbApi.publicContent.listAll()
+    fbApi.publicContent.listDistros()
       .then((docs) => {
-        const inWindow = (docs || [])
-          .filter((d: any) => isInDistrosWindow(d))
+        const mapped = (docs || [])
           .map(toShow)
           .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        setShows(inWindow);
+        setShows(mapped);
       })
       .finally(() => setLoading(false));
   }, [hasAccess, reloadKey]);

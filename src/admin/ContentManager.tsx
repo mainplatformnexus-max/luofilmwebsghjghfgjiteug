@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { Plus, Edit, Trash2, Search, Film, List } from "lucide-react";
+import { Plus, Edit, Trash2, Search, Film, List, Truck } from "lucide-react";
 import { api } from "./api";
 
 const GENRES = ["Romance","Drama","Action","Thriller","Fantasy","Historical","Comedy","Mystery","Xianxia","Wuxia","Campus","Medical","Period","Modern","Variety","Documentary","Sports","Anime"];
@@ -64,7 +64,7 @@ function ContentForm({ initial, onSave, onClose }: any) {
   const [form, setForm] = useState({
     title: "", type: "movie", genre: "Romance", description: "", thumbnailUrl: "", coverUrl: "",
     videoUrl: "", trailerUrl: "", year: new Date().getFullYear(), rating: 8.0, badge: "none",
-    duration: 120, status: "published", episodeCount: 0, ...initial
+    duration: 120, status: "published", episodeCount: 0, distros: false, ...initial
   });
   const [saving, setSaving] = useState(false);
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
@@ -141,6 +141,23 @@ function ContentForm({ initial, onSave, onClose }: any) {
           </select>
         </div>
         <div style={{ gridColumn: "1/-1" }}>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: form.distros ? "rgba(245,158,11,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${form.distros ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.08)"}`, borderRadius: 10, cursor: "pointer", transition: "all 0.2s" }}
+            onClick={() => set("distros", !form.distros)}
+          >
+            <div style={{ width: 38, height: 22, borderRadius: 11, background: form.distros ? "#f59e0b" : "rgba(255,255,255,0.12)", position: "relative", flexShrink: 0, transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: form.distros ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.3)" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: form.distros ? "#fbbf24" : "#fff" }}>Add to Distros</div>
+              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>Show this content in the Distros area (first-look access for distros members)</div>
+            </div>
+            {form.distros && (
+              <span style={{ marginLeft: "auto", padding: "2px 8px", background: "#f59e0b", color: "#fff", fontSize: 10, fontWeight: 800, borderRadius: 20, letterSpacing: "0.05em", flexShrink: 0 }}>DISTROS</span>
+            )}
+          </div>
+        </div>
+        <div style={{ gridColumn: "1/-1" }}>
           <label style={{ display: "block", fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 5, fontWeight: 600 }}>Description</label>
           <textarea style={{ ...inp, minHeight: 72, resize: "vertical" }} value={form.description} onChange={e => set("description", e.target.value)} />
         </div>
@@ -203,15 +220,31 @@ export default function ContentManager() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [distrosFilter, setDistrosFilter] = useState("");
   const [modal, setModal] = useState<null | "create" | any>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [togglingDistros, setTogglingDistros] = useState<string | null>(null);
 
   const load = () => {
     setLoading(true);
-    api.content.list({ search, type: typeFilter }).then(d => setContent(d.content || [])).finally(() => setLoading(false));
+    api.content.list({ search, type: typeFilter }).then(d => {
+      let items = d.content || [];
+      if (distrosFilter === "yes") items = items.filter((c: any) => !!c.distros);
+      else if (distrosFilter === "no") items = items.filter((c: any) => !c.distros);
+      setContent(items);
+    }).finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, [search, typeFilter]);
+  useEffect(() => { load(); }, [search, typeFilter, distrosFilter]);
+
+  const toggleDistros = async (c: any) => {
+    setTogglingDistros(c.id);
+    try {
+      await api.content.update(c.id, { distros: !c.distros });
+      load();
+    } catch (e) { alert(String(e)); }
+    setTogglingDistros(null);
+  };
 
   const del = async (id: string) => {
     if (!confirm("Delete this content? This will also remove all its episodes.")) return;
@@ -231,8 +264,8 @@ export default function ContentManager() {
         <Btn onClick={() => setModal("create")}><Plus size={15} /> Add Content</Btn>
       </div>
 
-      <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-        <div style={{ flex: 1, position: "relative" }}>
+      <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" as const }}>
+        <div style={{ flex: 1, minWidth: 180, position: "relative" }}>
           <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)" }} />
           <input style={{ ...inp, paddingLeft: 36 }} placeholder="Search content..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
@@ -241,22 +274,27 @@ export default function ContentManager() {
           <option value="movie">Movie</option>
           <option value="series">Series</option>
         </select>
+        <select style={{ ...inp, width: 150 }} value={distrosFilter} onChange={e => setDistrosFilter(e.target.value)}>
+          <option value="">All (incl. Distros)</option>
+          <option value="yes">Distros Only</option>
+          <option value="no">Not in Distros</option>
+        </select>
       </div>
 
       <div style={{ background: "#111118", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ background: "rgba(255,255,255,0.03)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              {["Thumbnail","Title","Type","Genre","Year","Rating","Badge","Status","Views","Actions"].map(h => (
+              {["Thumbnail","Title","Type","Genre","Year","Rating","Badge","Status","Distros","Views","Actions"].map(h => (
                 <th key={h} style={{ padding: "12px 14px", textAlign: "left", color: "rgba(255,255,255,0.45)", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>Loading...</td></tr>
+              <tr><td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>Loading...</td></tr>
             ) : content.length === 0 ? (
-              <tr><td colSpan={10} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>No content yet. Add your first movie or series!</td></tr>
+              <tr><td colSpan={11} style={{ padding: 40, textAlign: "center", color: "rgba(255,255,255,0.3)" }}>No content yet. Add your first movie or series!</td></tr>
             ) : content.map(c => (
               <tr key={c.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                 <td style={{ padding: "10px 14px" }}>
@@ -282,6 +320,22 @@ export default function ContentManager() {
                 </td>
                 <td style={{ padding: "10px 14px" }}>
                   <span style={{ padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 600, background: c.status === "published" ? "#10b98122" : "#ef444422", color: c.status === "published" ? "#34d399" : "#f87171" }}>{c.status}</span>
+                </td>
+                <td style={{ padding: "10px 14px" }}>
+                  <button
+                    onClick={() => toggleDistros(c)}
+                    disabled={togglingDistros === c.id}
+                    title={c.distros ? "Remove from Distros" : "Add to Distros"}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 5,
+                      padding: "4px 10px", borderRadius: 20, border: "none", cursor: togglingDistros === c.id ? "not-allowed" : "pointer",
+                      fontSize: 11, fontWeight: 700, transition: "all 0.15s",
+                      background: c.distros ? "rgba(245,158,11,0.18)" : "rgba(255,255,255,0.06)",
+                      color: c.distros ? "#fbbf24" : "rgba(255,255,255,0.3)",
+                    }}
+                  >
+                    <Truck size={11} /> {c.distros ? "Yes" : "No"}
+                  </button>
                 </td>
                 <td style={{ padding: "10px 14px", color: "rgba(255,255,255,0.5)" }}>{c.views || 0}</td>
                 <td style={{ padding: "10px 14px" }}>
