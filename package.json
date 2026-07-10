@@ -73,8 +73,10 @@
     "zod": "^3.25.76"
   },
   "dependencies": {
+    "dashjs": "^5.2.0",
     "drizzle-orm": "^0.45.1",
     "firebase": "^12.11.0",
+    "hls.js": "^1.6.16",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "pg": "^8.20.0",

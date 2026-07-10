@@ -4,8 +4,8 @@ import { fbApi } from "./firebaseApi";
 
 export const ADMIN_EMAILS = ["mainplatform.nexus@gmail.com"];
 
-export const DISTRO_EXCLUSIVE_MS = 24 * 60 * 60 * 1000;
-export const DISTRO_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+export const DISTRO_EXCLUSIVE_MS = 7 * 24 * 60 * 60 * 1000;   // 1 week early-access window
+export const DISTRO_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days in distros feed
 
 export const DISTROS_PLAN_ID = "distros";
 export const DISTROS_PLAN_LABEL = "Distros — 1 Month";
