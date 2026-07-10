@@ -65,7 +65,7 @@ function ShowCard({ show }: { show: Show }) {
   return (
     <Link href={`/play/${show.id}`}>
       <div style={{ cursor: "pointer" }} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-        <div style={{ position: "relative", paddingTop: "133.33%", borderRadius: 6, overflow: "hidden", background: "#1a1a1a" }}>
+        <div style={{ position: "relative", paddingTop: "133.33%", borderRadius: 6, overflow: "hidden", background: "#0f1d35" }}>
           <img src={show.thumbnailUrl} alt={show.title} loading="lazy"
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transform: hovered ? "scale(1.05)" : "scale(1)", transition: "transform 0.35s ease" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 50, backgroundImage: "linear-gradient(180deg, transparent, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.55))" }} />
@@ -164,7 +164,7 @@ export default function CategoryPage({ genre, title, description: _description }
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#0c1426", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Loading...</div>
       </div>
     );
@@ -172,7 +172,7 @@ export default function CategoryPage({ genre, title, description: _description }
 
   if (shows.length === 0) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+      <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
         <div style={{ height: 54 }} />
         <div style={{ padding: "60px 20px", textAlign: "center" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 32 }}>
@@ -190,13 +190,13 @@ export default function CategoryPage({ genre, title, description: _description }
   const featured = shows[0];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
       <div style={{ height: 54 }} />
       <div className="category-page-pad" style={{ padding: "32px 20px 60px" }}>
         {featured && (
           <div style={{ marginBottom: 40 }}>
             <Link href={`/play/${featured.id}`}>
-              <div className="category-featured" style={{ position: "relative", borderRadius: 10, overflow: "hidden", cursor: "pointer", height: 280, background: "#1a1a1a" }}>
+              <div className="category-featured" style={{ position: "relative", borderRadius: 10, overflow: "hidden", cursor: "pointer", height: 280, background: "#0f1d35" }}>
                 <img src={featured.coverUrl || featured.thumbnailUrl} alt={featured.title} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }} />
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.85) 40%, transparent)" }} />
                 <div className="category-featured-inner" style={{ position: "absolute", bottom: 28, left: 28, maxWidth: 480 }}>

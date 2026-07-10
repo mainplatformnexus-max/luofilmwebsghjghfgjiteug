@@ -3,7 +3,7 @@ import { useSEO } from "../hooks/useSEO";
 export default function PrivacyPage() {
   useSEO({ title: "Privacy Policy", description: "LUOFILM.SITE Privacy Policy — how we collect, use and protect your data on our Luo translated movies streaming platform.", url: "/privacy" });
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff", padding: "30px 20px 60px" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff", padding: "30px 20px 60px" }}>
       <div style={{ maxWidth: 820, margin: "0 auto" }}>
         <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 6 }}>Privacy Policy</h1>
         <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 36 }}>Last updated: January 1, 2025</p>

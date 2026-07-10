@@ -26,7 +26,7 @@ function MainSite() {
   const hideFooter = location.startsWith("/play/");
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] mobile-pb">
+    <div className="min-h-screen mobile-pb" style={{ background: "#0c1426" }}>
       <Header />
       <OpenInAppBanner />
       <MobileBottomNav />

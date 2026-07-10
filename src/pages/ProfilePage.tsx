@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
+      <div style={{ minHeight: "100vh", background: "#0c1426", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
         <User size={48} color="rgba(255,255,255,0.15)" />
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>Please log in to view your profile.</p>
         <Link href="/">
@@ -84,7 +84,7 @@ export default function ProfilePage() {
   const daysLeft = expiresAt ? Math.max(0, Math.ceil((expiresAt - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
       <div style={{ height: 54 }} />
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 16px 80px" }}>
 

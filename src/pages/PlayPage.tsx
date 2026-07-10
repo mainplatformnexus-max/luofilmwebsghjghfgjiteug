@@ -126,12 +126,18 @@ export default function PlayPage() {
   useEffect(() => {
     fbApi.settings.get().then((s: any) => {
       if (!s) return;
-      const prices = [
-        Number(s.plan1WeekPrice ?? 10000),
-        Number(s.plan1MonthPrice ?? 30000),
-        Number(s.plan3MonthsPrice ?? 75000),
-      ].filter(Boolean);
-      setMinPlanPrice(Math.min(...prices));
+      // Use vipPlans array if available, otherwise fall back to legacy keys
+      const dynamicPlans = Array.isArray(s.vipPlans) && s.vipPlans.length > 0
+        ? s.vipPlans.filter((p: any) => p.active !== false)
+        : null;
+      const prices = dynamicPlans
+        ? dynamicPlans.map((p: any) => Number(p.price || 0)).filter(Boolean)
+        : [
+            Number(s.plan1WeekPrice ?? 10000),
+            Number(s.plan1MonthPrice ?? 30000),
+            Number(s.plan3MonthsPrice ?? 75000),
+          ].filter(Boolean);
+      if (prices.length > 0) setMinPlanPrice(Math.min(...prices));
     }).catch(() => {});
   }, []);
 
@@ -198,6 +204,67 @@ export default function PlayPage() {
       .then(setIsSubscribed)
       .catch(() => setIsSubscribed(false));
   }, [user]);
+
+  // Schema.org JSON-LD — injected per content page for Google rich results
+  useEffect(() => {
+    if (!show) return;
+    const schema: Record<string, any> = {
+      "@context": "https://schema.org",
+      "@type": show.type === "movie" ? "Movie" : "TVSeries",
+      "name": show.title,
+      "description": show.description
+        ? show.description.slice(0, 500)
+        : `Watch ${show.title} — Luo translated ${show.type === "movie" ? "movie" : "series"} by SENIOR PAUL on LUOFILM.SITE. Free streaming worldwide.`,
+      "url": `https://luofilm.site/play/${show.id}`,
+      "image": [show.coverUrl, show.thumbnailUrl].filter(Boolean)[0] || "https://luofilm.site/logo.png",
+      "inLanguage": "luo",
+      "genre": show.genre || undefined,
+      "contentRating": "General",
+      "potentialAction": {
+        "@type": "WatchAction",
+        "target": `https://luofilm.site/play/${show.id}`,
+      },
+      "provider": {
+        "@type": "Organization",
+        "name": "LUOFILM.SITE",
+        "url": "https://luofilm.site",
+        "logo": { "@type": "ImageObject", "url": "https://luofilm.site/logo.png" },
+      },
+      "author": {
+        "@type": "Person",
+        "name": "SENIOR PAUL",
+        "url": "https://luofilm.site",
+      },
+      "countryOfOrigin": { "@type": "Country", "name": "Uganda" },
+      "keywords": `luo translated, ${show.title}, ${show.genre || ""}, SENIOR PAUL, LUOFILM.SITE, luo movies, luo drama`,
+    };
+    if (show.year) schema["dateCreated"] = String(show.year);
+    if (show.rating) {
+      schema["aggregateRating"] = {
+        "@type": "AggregateRating",
+        "ratingValue": show.rating,
+        "bestRating": 10,
+        "worstRating": 1,
+        "ratingCount": Math.max(50, Math.round((show.rating ?? 8) * 12)),
+      };
+    }
+    if (show.coverUrl || show.thumbnailUrl) {
+      schema["image"] = {
+        "@type": "ImageObject",
+        "url": show.coverUrl || show.thumbnailUrl,
+        "representativeOfPage": true,
+      };
+    }
+    let el = document.getElementById("lf-schema-jsonld") as HTMLScriptElement | null;
+    if (!el) {
+      el = document.createElement("script");
+      el.id = "lf-schema-jsonld";
+      el.type = "application/ld+json";
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(schema, null, 0);
+    return () => { document.getElementById("lf-schema-jsonld")?.remove(); };
+  }, [show]);
 
   useEffect(() => {
     const defaultTitle = "LUOFILM.SITE — VJ PAUL FREE DOWNLOAD";
@@ -363,18 +430,32 @@ export default function PlayPage() {
   const handleDownload = async (quality: string, url: string) => {
     if (!url) { showToast("No video available to download"); setShowQualityPicker(false); return; }
     setShowQualityPicker(false);
-    const isEmbed = /youtube\.com|youtu\.be|drive\.google\.com|vimeo\.com/.test(url);
+
+    // Google Drive: use direct GDrive download (not the backend proxy)
+    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      const fileId = driveMatch[1];
+      const dlUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      showToast("Opening Google Drive download…");
+      window.open(dlUrl, "_blank");
+      return;
+    }
+
+    // YouTube / Vimeo embeds: open in new tab
+    const isEmbed = /youtube\.com|youtu\.be|vimeo\.com/.test(url);
     if (isEmbed) {
       showToast("Opening in new tab for download");
       window.open(url, "_blank");
       return;
     }
+
+    // Direct URL: proxy through backend with SENIOR PAUL filename
     setDownloading(true);
     showToast(`Starting download (${quality})…`);
     try {
       const baseTitle = show?.title || "video";
       const episodePart = isSeries ? ` Episode ${currentEp}` : "";
-      const filename = `${baseTitle}${episodePart} VJ PAUL UG (www.luofilm.site).mp4`;
+      const filename = `${baseTitle}${episodePart} SENIOR PAUL (www.luofilm.site).mp4`;
       const proxyUrl = `https://download.mainplatform-nexus.workers.dev/?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}&download=1`;
       const a = document.createElement("a");
       a.href = proxyUrl;
@@ -390,7 +471,7 @@ export default function PlayPage() {
 
   if (loadingShow) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#0c1426", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Loading...</div>
       </div>
     );
@@ -398,7 +479,7 @@ export default function PlayPage() {
 
   if (!show) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+      <div style={{ minHeight: "100vh", background: "#0c1426", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
         <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 16 }}>Content not found</div>
         <Link href="/"><button style={{ padding: "8px 20px", background: "#00a9f5", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}>Go Home</button></Link>
       </div>
@@ -435,7 +516,7 @@ export default function PlayPage() {
 
   return (
     <>
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
       {toast && (
         <div style={{
           position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)",

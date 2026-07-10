@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Link } from "wouter";
 import { ChevronLeft, ChevronRight, Play, Sparkles } from "lucide-react";
 import { fbApi } from "../lib/firebaseApi";
@@ -157,146 +157,171 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, [isDistro]);
 
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // ── 4-column infinite auto-rotating hero slider ──
+  const CLONE = 4; // clone buffer on each side
+  const [sliderPos, setSliderPos] = useState(CLONE);
+  const [animated, setAnimated] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(4);
+  const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const goToSlide = useCallback(
-    (index: number) => {
-      if (isTransitioning) return;
-      setIsTransitioning(true);
-      setActiveSlide(index);
-      setTimeout(() => setIsTransitioning(false), 400);
-    },
-    [isTransitioning]
-  );
+  // Extended slide list: [last CLONE items | all items | first CLONE items]
+  const extendedSlides = useMemo(() => {
+    if (bannerShows.length === 0) return [];
+    const tail = bannerShows.slice(-CLONE);
+    const head = bannerShows.slice(0, CLONE);
+    return [...tail, ...bannerShows, ...head];
+  }, [bannerShows]);
 
-  const nextSlide = useCallback(() => {
-    setActiveSlide((prev) => (prev + 1) % Math.max(bannerShows.length, 1));
-  }, [bannerShows.length]);
+  useEffect(() => {
+    const check = () => setVisibleCount(window.innerWidth < 600 ? 2 : 4);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
-  const prevSlide = useCallback(() => {
-    setActiveSlide((prev) => (prev - 1 + Math.max(bannerShows.length, 1)) % Math.max(bannerShows.length, 1));
+  const stepPct = 100 / visibleCount;
+
+  const startAuto = useCallback(() => {
+    if (autoRef.current) clearInterval(autoRef.current);
+    if (bannerShows.length < 2) return;
+    autoRef.current = setInterval(() => {
+      setAnimated(true);
+      setSliderPos((p) => p + 1);
+    }, 2800);
   }, [bannerShows.length]);
 
   useEffect(() => {
-    if (bannerShows.length === 0) return;
-    timerRef.current = setInterval(nextSlide, 5000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [nextSlide, bannerShows.length]);
+    startAuto();
+    return () => { if (autoRef.current) clearInterval(autoRef.current); };
+  }, [startAuto]);
 
-  const restartTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(nextSlide, 5000);
+  const handleSliderTransitionEnd = useCallback(() => {
+    const N = bannerShows.length;
+    setSliderPos((p) => {
+      if (p >= CLONE + N) { setAnimated(false); return CLONE; }
+      if (p <= 0)         { setAnimated(false); return N; }
+      return p;
+    });
+  }, [bannerShows.length]);
+
+  const goSlider = (dir: 1 | -1) => {
+    setAnimated(true);
+    setSliderPos((p) => p + dir);
+    startAuto();
   };
-
-  const handleGoToSlide = (i: number) => { goToSlide(i); restartTimer(); };
-  const handlePrev = () => { prevSlide(); restartTimer(); };
-  const handleNext = () => { nextSlide(); restartTimer(); };
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0e0e0e", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Loading...</div>
+      <div style={{ minHeight: "100vh", background: "#0c1426", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: "rgba(180,210,255,0.45)", fontSize: 14 }}>Loading...</div>
       </div>
     );
   }
-
-  const currentIdx = bannerShows.length > 0 ? Math.min(activeSlide, bannerShows.length - 1) : 0;
-  const currentShow = bannerShows[currentIdx];
-  const midFallback = bannerShows.filter((_, i) => i !== currentIdx);
-  const midPanel = featuredShows.length > 0
-    ? featuredShows
-    : midFallback.length > 0
-      ? midFallback
-      : shows.slice(0, 6);
-  const sideShows = midPanel.slice(0, 2);
-  const miniShows = midPanel.slice(2, 6);
 
   const movies = shows.filter(s => s.type === "movie");
   const series = shows.filter(s => s.type === "series");
   const byGenre = (g: string) => shows.filter(s => (s.genre || "").toLowerCase().includes(g));
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
       <div className="mobile-header-spacer" style={{ height: 54 }} />
 
+      {/* ── Compact 4-column infinite auto-rotating hero slider ── */}
       {bannerShows.length === 0 ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 400, color: "rgba(255,255,255,0.3)", fontSize: 15 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 200, color: "rgba(180,210,255,0.3)", fontSize: 14 }}>
           No content published yet. Add content from the admin panel.
         </div>
       ) : (
-        <div className="carousel-wrapper" style={{ display: "flex", gap: 8, padding: "10px 12px", boxSizing: "border-box" }}>
-          <div className="carousel-main-wrap" style={{ flex: "0 0 48%", position: "relative", minWidth: 0 }}>
-            <div className="carousel-mobile-full" style={{ width: "100%", position: "relative", overflow: "hidden", borderRadius: 6, background: "#1a1a1a" }}>
-              <div style={{ paddingTop: "56.25%" }} />
-              <img
-                key={currentShow.id}
-                src={currentShow.thumbnailUrl}
-                alt={currentShow.title}
+        <div style={{ padding: "8px 0 18px" }}>
+          {/* Section label + progress dots */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 14px", marginBottom: 8 }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#00a9f5", textTransform: "uppercase", letterSpacing: "0.14em" }}>
+              🎬 Now Streaming
+            </span>
+            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+              {bannerShows.slice(0, 20).map((_, i) => {
+                const realPos = ((sliderPos - CLONE) % bannerShows.length + bannerShows.length) % bannerShows.length;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => { setAnimated(true); setSliderPos(CLONE + i); startAuto(); }}
+                    style={{ height: 3, width: i === realPos ? 18 : 5, borderRadius: 2, background: i === realPos ? "#00a9f5" : "rgba(180,210,255,0.2)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.35s" }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Slider track */}
+          <div style={{ position: "relative", padding: "0 14px" }}>
+            <div style={{ overflow: "hidden", borderRadius: 8 }}>
+              <div
                 style={{
-                  position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
-                  opacity: isTransitioning ? 0.7 : 1, transition: "opacity 0.4s ease",
+                  display: "flex",
+                  transform: `translateX(-${sliderPos * stepPct}%)`,
+                  transition: animated ? "transform 0.48s cubic-bezier(0.4,0,0.2,1)" : "none",
+                  willChange: "transform",
                 }}
-              />
-
-              <div className="carousel-overlay" style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px 20px" }}>
-                {currentShow.badge && currentShow.badge !== "none" && (
-                  <span style={{
-                    display: "inline-block", padding: "1px 8px", borderRadius: 2, fontSize: 11, fontWeight: 700, marginBottom: 8,
-                    background: currentShow.badge === "VIP" ? "linear-gradient(90deg,#ffc552,#ffdd9a)" : currentShow.badge === "Express" ? "linear-gradient(90deg,#00a3f5,#00c9fd)" : "linear-gradient(90deg,#8819ff,#ad61ff)",
-                    color: currentShow.badge === "VIP" ? "#4e2d03" : "#fff",
-                  }}>{currentShow.badge}</span>
-                )}
-                <h2 className="carousel-title" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.3, marginBottom: 6, textShadow: "0 1px 4px rgba(0,0,0,0.8)", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {currentShow.title}
-                </h2>
-                <p className="carousel-desc" style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", marginBottom: 12, maxWidth: 380 }}>
-                  {currentShow.description}
-                </p>
-                <div className="carousel-actions" style={{ display: "flex", gap: 8 }}>
-                  <Link href={`/play/${currentShow.id}`}>
-                    <button className="carousel-btn" style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 20, background: "#00a9f5", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" }}>
-                      ▶ PLAY NOW
-                    </button>
-                  </Link>
-                  <Link href={`/play/${currentShow.id}`}>
-                    <button className="carousel-btn" style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 13, fontWeight: 500, border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }}>
-                      DETAILS
-                    </button>
-                  </Link>
-                </div>
-              </div>
-
-              <button onClick={handlePrev} style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", width: 32, height: 32, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <ChevronLeft size={16} />
-              </button>
-              <button onClick={handleNext} style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", width: 32, height: 32, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <ChevronRight size={16} />
-              </button>
-
-              <div style={{ position: "absolute", bottom: 8, right: 12, display: "flex", gap: 4 }}>
-                {bannerShows.map((_, i) => (
-                  <button key={i} onClick={() => handleGoToSlide(i)} style={{ height: 3, width: i === currentIdx ? 20 : 6, borderRadius: 2, background: i === currentIdx ? "#fff" : "rgba(255,255,255,0.35)", border: "none", cursor: "pointer", padding: 0, transition: "all 0.3s" }} />
+                onTransitionEnd={handleSliderTransitionEnd}
+              >
+                {extendedSlides.map((show, i) => (
+                  <div
+                    key={`${show.id}_${i}`}
+                    style={{ flex: `0 0 ${stepPct}%`, width: `${stepPct}%`, padding: "0 4px", boxSizing: "border-box" }}
+                  >
+                    <Link href={`/play/${show.id}`}>
+                      <div
+                        onClick={() => saveLastClickedShow(show)}
+                        style={{ borderRadius: 7, overflow: "hidden", position: "relative", cursor: "pointer", background: "#0f1d35" }}
+                      >
+                        <div style={{ paddingTop: "56.25%" }} />
+                        <img
+                          src={show.thumbnailUrl || show.coverUrl}
+                          alt={show.title}
+                          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                          loading="lazy"
+                        />
+                        {show.badge && show.badge !== "none" && (
+                          <span style={{
+                            position: "absolute", top: 0, right: 0, padding: "2px 7px",
+                            borderRadius: "0 7px 0 7px", fontSize: 10, fontWeight: 700,
+                            background: show.badge === "VIP" ? "linear-gradient(90deg,#ffc552,#ffdd9a)" : show.badge === "Express" ? "linear-gradient(90deg,#00a3f5,#00c9fd)" : "linear-gradient(90deg,#8819ff,#ad61ff)",
+                            color: show.badge === "VIP" ? "#4e2d03" : "#fff",
+                          }}>{show.badge}</span>
+                        )}
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "18px 8px 7px", background: "linear-gradient(transparent, rgba(6,14,30,0.96))" }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {show.title}
+                          </div>
+                          <div style={{ fontSize: 9.5, color: "rgba(160,200,255,0.6)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {show.type === "series" ? `${show.episodeCount || "?"} EPS` : "Movie"}{show.genre ? ` · ${show.genre.split("·")[0].trim().split(",")[0].trim()}` : ""}
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
 
-          <div className="carousel-side-panel" style={{ flex: "0 0 200px", display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: "0 0 auto" }}>
-              {sideShows.map((show) => <SideShowCard key={show.id} show={show} />)}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-              {miniShows.map((show) => <MiniShowCard key={show.id} show={show} />)}
-            </div>
+            {/* Navigation arrows */}
+            <button
+              onClick={() => goSlider(-1)}
+              style={{ position: "absolute", left: 2, top: "50%", transform: "translateY(-50%)", width: 28, height: 28, borderRadius: "50%", background: "rgba(10,18,38,0.92)", border: "1px solid rgba(59,130,246,0.28)", color: "#c8dcff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5, backdropFilter: "blur(6px)", transition: "border-color 0.2s" }}
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <button
+              onClick={() => goSlider(1)}
+              style={{ position: "absolute", right: 2, top: "50%", transform: "translateY(-50%)", width: 28, height: 28, borderRadius: "50%", background: "rgba(10,18,38,0.92)", border: "1px solid rgba(59,130,246,0.28)", color: "#c8dcff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 5, backdropFilter: "blur(6px)", transition: "border-color 0.2s" }}
+            >
+              <ChevronRight size={14} />
+            </button>
           </div>
-
-          <SecondaryCarousel shows={secondaryShows} />
         </div>
       )}
 
-      <div style={{ padding: "8px 12px 40px" }}>
+      <div style={{ padding: "0 12px 40px" }}>
         <SmartRecommender allShows={shows} />
         {shows.length > 0 && (
           <ContentRow title="ALL CONTENT" subtitle="RECENTLY ADDED" shows={shows.slice(0, 10)} categoryHref="/drama" />

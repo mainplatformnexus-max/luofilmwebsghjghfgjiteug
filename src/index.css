@@ -393,7 +393,7 @@
 }
 
 html, body, #root {
-  background-color: #0a0a0a;
+  background-color: #0c1426;
   font-family: Georgia, 'Times New Roman', serif;
   overflow-x: hidden;
   max-width: 100vw;
@@ -696,16 +696,16 @@ input, button, select, textarea {
 }
 
 ::-webkit-scrollbar-track {
-  background: #111;
+  background: #0c1426;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #1e3255;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #2a4a7a;
 }
 
 /* mobile-only: visible only on mobile */

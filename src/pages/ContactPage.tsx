@@ -22,7 +22,7 @@ const ShieldIcon = () => (
 export default function ContactPage() {
   useSEO({ title: "Contact Us — LUOFILM.SITE", description: "Contact LUOFILM.SITE — reach us on WhatsApp +256 760 734 679 or email mainplatform.nexus@gmail.com for support, DMCA notices and business inquiries.", url: "/contact" });
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff", padding: "30px 20px 60px" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff", padding: "30px 20px 60px" }}>
       <div style={{ maxWidth: 820, margin: "0 auto" }}>
         <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 6 }}>Contact Us</h1>
         <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 36 }}>We're here to help. Reach out through any of the channels below.</p>

@@ -4,4 +4,8 @@
     <loc>https://luofilm.site/sitemap.xml</loc>
     <lastmod>2025-01-01</lastmod>
   </sitemap>
+  <sitemap>
+    <loc>https://luofilm.site/sitemap-dynamic.xml</loc>
+    <lastmod>2025-01-01</lastmod>
+  </sitemap>
 </sitemapindex>

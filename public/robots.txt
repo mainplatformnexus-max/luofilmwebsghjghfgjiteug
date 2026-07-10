@@ -68,6 +68,7 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://luofilm.site/sitemap.xml
+Sitemap: https://luofilm.site/sitemap-dynamic.xml
 Sitemap: https://luofilm.site/sitemap-index.xml
 
 # Crawl delay for politeness

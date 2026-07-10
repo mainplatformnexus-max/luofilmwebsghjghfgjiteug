@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Shield, Globe, Database, Bell, Loader, ImageIcon, CreditCard } from "lucide-react";
+import { Save, Shield, Globe, Database, Bell, Loader, ImageIcon, CreditCard, Trash2, Plus } from "lucide-react";
 import { api } from "./api";
 import { auth } from "../lib/firebase";
 import { clearPaymentBaseCache } from "../lib/paymentApi";
@@ -8,6 +8,13 @@ import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 
 const TIMEZONES = [
   "Africa/Kampala","Africa/Nairobi","Africa/Lagos","Africa/Accra",
   "Africa/Dar_es_Salaam","Africa/Kigali","UTC","Europe/London","America/New_York","Asia/Shanghai",
+];
+
+// Must be declared BEFORE DEFAULT_SETTINGS to avoid TDZ
+const DEFAULT_VIP_PLANS = [
+  { id: "week1",   label: "1 Week Pass",   price: 10000, durationValue: 7, durationUnit: "days",   tag: "TRY IT",   tagColor: "#888",    active: true },
+  { id: "month1",  label: "1 Month Pass",  price: 30000, durationValue: 1, durationUnit: "months", tag: "POPULAR",  tagColor: "#f5a623", active: true },
+  { id: "months3", label: "3 Months Pass", price: 75000, durationValue: 3, durationUnit: "months", tag: "BEST DEAL",tagColor: "#059669", active: true },
 ];
 
 const DEFAULT_SETTINGS = {
@@ -24,6 +31,7 @@ const DEFAULT_SETTINGS = {
   plan1MonthPrice: 30000,
   plan3MonthsPrice: 75000,
   planDistrosPrice: 50000,
+  vipPlans: DEFAULT_VIP_PLANS as any[],
   maxDevices: 3,
   watermarkEnabled: true,
   analyticsEnabled: true,
@@ -77,13 +85,88 @@ function Toggle({ checked, onChange, label, hint }: any) {
   );
 }
 
-const VIP_PLANS = [
-  { key: "plan1WeekPrice", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888" },
-  { key: "plan1MonthPrice", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623" },
-  { key: "plan3MonthsPrice", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669" },
+const DISTROS_PLAN = { key: "planDistrosPrice", label: "Distros Pass — 1 Month", tag: "DISTROS", tagColor: "#f59e0b", days: 30 };
+
+const UNIT_OPTIONS = [
+  { value: "hours", label: "Hour(s)" },
+  { value: "days", label: "Day(s)" },
+  { value: "weeks", label: "Week(s)" },
+  { value: "months", label: "Month(s)" },
+  { value: "years", label: "Year(s)" },
 ];
 
-const DISTROS_PLAN = { key: "planDistrosPrice", label: "Distros Pass — 1 Month", tag: "DISTROS", tagColor: "#f59e0b", days: 30 };
+const TAG_PRESETS = [
+  { label: "TRY IT",   color: "#888" },
+  { label: "POPULAR",  color: "#f5a623" },
+  { label: "BEST DEAL",color: "#059669" },
+  { label: "NEW",      color: "#3b82f6" },
+  { label: "VIP",      color: "#8b5cf6" },
+  { label: "HOT",      color: "#ef4444" },
+  { label: "PROMO",    color: "#14b8a6" },
+];
+
+function newPlanId() { return `plan_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`; }
+
+function PlanEditor({ plan, onChange, onDelete }: { plan: any; onChange: (p: any) => void; onDelete: () => void }) {
+  const upd = (k: string, v: any) => onChange({ ...plan, [k]: v });
+  return (
+    <div style={{ border: `1px solid ${plan.active ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.04)"}`, borderRadius: 10, padding: 14, background: plan.active ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.2)", position: "relative", opacity: plan.active ? 1 : 0.55, transition: "opacity 0.2s" }}>
+      <div style={{ position: "absolute", top: -1, left: -1, background: plan.tagColor, color: "#fff", fontSize: 9, fontWeight: 800, padding: "2px 10px", borderRadius: "9px 0 9px 0", letterSpacing: "0.05em" }}>{plan.tag || "PLAN"}</div>
+
+      {/* Row 1: label, price, duration, delete */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 160px auto auto", gap: 10, marginTop: 14, alignItems: "end" }}>
+        <div>
+          <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 4, fontWeight: 600 }}>Plan Label</label>
+          <input style={inp} value={plan.label || ""} onChange={e => upd("label", e.target.value)} placeholder="e.g. 1 Week Pass" />
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 4, fontWeight: 600 }}>Price (UGX)</label>
+          <div style={{ position: "relative" }}>
+            <span style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", fontSize: 10, color: "rgba(255,255,255,0.3)", fontWeight: 600 }}>UGX</span>
+            <input style={{ ...inp, paddingLeft: 38, color: "#fbbf24", fontWeight: 700, fontSize: 14 }} type="number" step="100" min="0" value={plan.price || 0} onChange={e => upd("price", Number(e.target.value))} />
+          </div>
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 4, fontWeight: 600 }}>Duration</label>
+          <div style={{ display: "flex", gap: 6 }}>
+            <input style={{ ...inp, width: 56, textAlign: "center" as const }} type="number" min="1" value={plan.durationValue || 1} onChange={e => upd("durationValue", Number(e.target.value))} />
+            <select style={{ ...inp, width: 110 }} value={plan.durationUnit || "days"} onChange={e => upd("durationUnit", e.target.value)}>
+              {UNIT_OPTIONS.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+            </select>
+          </div>
+        </div>
+        <button onClick={onDelete} title="Delete plan" style={{ padding: "7px 9px", background: "#ef444420", border: "none", borderRadius: 6, color: "#f87171", cursor: "pointer", display: "flex", alignItems: "center", alignSelf: "end", marginBottom: 1 }}><Trash2 size={13} /></button>
+      </div>
+
+      {/* Row 2: tag text, tag color, active */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 10, marginTop: 10, alignItems: "end" }}>
+        <div>
+          <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 4, fontWeight: 600 }}>Tag Text</label>
+          <input style={inp} value={plan.tag || ""} onChange={e => upd("tag", e.target.value)} placeholder="e.g. POPULAR" />
+        </div>
+        <div>
+          <label style={{ display: "block", fontSize: 11, color: "rgba(255,255,255,0.45)", marginBottom: 4, fontWeight: 600 }}>Tag Color</label>
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap" as const, alignItems: "center" }}>
+            {TAG_PRESETS.map(t => (
+              <button key={t.color} onClick={() => { upd("tagColor", t.color); upd("tag", t.label); }}
+                title={t.label}
+                style={{ width: 20, height: 20, borderRadius: 4, background: t.color, border: plan.tagColor === t.color ? "2.5px solid #fff" : "1px solid rgba(255,255,255,0.1)", cursor: "pointer", flexShrink: 0 }} />
+            ))}
+            <input type="color" value={plan.tagColor || "#888"} onChange={e => upd("tagColor", e.target.value)}
+              style={{ width: 20, height: 20, padding: 0, border: "1px solid rgba(255,255,255,0.2)", borderRadius: 4, cursor: "pointer", background: "none" }} title="Custom color" />
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, paddingBottom: 2 }}>
+          <label style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>ACTIVE</label>
+          <div onClick={() => upd("active", !plan.active)}
+            style={{ width: 34, height: 20, borderRadius: 10, background: plan.active ? "#6366f1" : "rgba(255,255,255,0.1)", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+            <div style={{ position: "absolute", top: 2, left: plan.active ? 16 : 2, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.4)" }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Settings() {
   const [loading, setLoading] = useState(true);
@@ -207,31 +290,36 @@ export default function Settings() {
       <Section title="VIP Subscription Plans" icon={Database}>
         <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(245,166,35,0.08)", borderRadius: 8, border: "1px solid rgba(245,166,35,0.25)" }}>
           <span style={{ fontSize: 12, color: "#fbbf24" }}>
-            🇺🇬 All plans priced in <strong>UGX (Ugandan Shilling)</strong> — changes here update the VIP modal prices in real time
+            🇺🇬 All plans priced in <strong>UGX</strong> — add, edit, or remove plans anytime. Duration can be hours, days, weeks, months, or years. Changes update the VIP modal in real time.
           </span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
-          {VIP_PLANS.map(p => (
-            <div key={p.key} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: 14, position: "relative" }}>
-              <div style={{ position: "absolute", top: -1, left: -1, background: p.tagColor, color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: "9px 0 9px 0", letterSpacing: "0.04em" }}>{p.tag}</div>
-              <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 8, marginTop: 12 }}>{p.label}</div>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 600 }}>UGX</span>
-                <input
-                  style={{ ...inp, paddingLeft: 42, fontWeight: 700, fontSize: 15, color: "#fbbf24" }}
-                  type="number"
-                  step="100"
-                  min="0"
-                  value={(settings as any)[p.key]}
-                  onChange={e => set(p.key, Number(e.target.value))}
-                />
-              </div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 6, textAlign: "center" as const }}>
-                UGX {Number((settings as any)[p.key]).toLocaleString()}
-              </div>
-            </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
+          {((settings as any).vipPlans || DEFAULT_VIP_PLANS).map((plan: any, idx: number) => (
+            <PlanEditor
+              key={plan.id || idx}
+              plan={plan}
+              onChange={(updated: any) => {
+                const plans = [...((settings as any).vipPlans || DEFAULT_VIP_PLANS)];
+                plans[idx] = updated;
+                set("vipPlans", plans);
+              }}
+              onDelete={() => {
+                const plans = ((settings as any).vipPlans || DEFAULT_VIP_PLANS).filter((_: any, i: number) => i !== idx);
+                set("vipPlans", plans);
+              }}
+            />
           ))}
         </div>
+        <button
+          onClick={() => {
+            const plans = [...((settings as any).vipPlans || DEFAULT_VIP_PLANS)];
+            plans.push({ id: newPlanId(), label: "New Plan", price: 0, durationValue: 1, durationUnit: "months", tag: "NEW", tagColor: "#3b82f6", active: true });
+            set("vipPlans", plans);
+          }}
+          style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 16px", background: "rgba(99,102,241,0.15)", border: "1px dashed rgba(99,102,241,0.4)", borderRadius: 8, color: "#818cf8", cursor: "pointer", fontSize: 13, fontWeight: 600, marginBottom: 20 }}
+        >
+          <Plus size={14} /> Add New Plan
+        </button>
         <div style={{ marginTop: 4, marginBottom: 18, padding: "12px 14px", background: "rgba(245,158,11,0.06)", borderRadius: 10, border: "1px solid rgba(245,158,11,0.25)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flexWrap: "wrap" as const }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

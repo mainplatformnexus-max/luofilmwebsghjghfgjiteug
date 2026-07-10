@@ -43,7 +43,7 @@ export default function HistoryPage() {
   const grouped = groupByDate(history);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e", color: "#fff" }}>
+    <div style={{ minHeight: "100vh", background: "#0c1426", color: "#fff" }}>
       <div style={{ height: 54 }} />
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 16px 80px" }}>
 

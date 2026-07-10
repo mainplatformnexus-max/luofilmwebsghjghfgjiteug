@@ -3,10 +3,40 @@ import { fbApi } from "../lib/firebaseApi";
 import { paymentApi, PaymentStatus } from "../lib/paymentApi";
 import { useAuth } from "../contexts/AuthContext";
 
-const DEFAULT_PLANS = [
-  { id: "week1", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888", price: 10000, days: 7 },
-  { id: "month1", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623", price: 30000, days: 30 },
-  { id: "months3", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669", price: 75000, days: 90 },
+// Duration helpers
+function durationToMs(value: number, unit: string): number {
+  const ms: Record<string, number> = {
+    hours:  60 * 60 * 1000,
+    days:   24 * 60 * 60 * 1000,
+    weeks:  7 * 24 * 60 * 60 * 1000,
+    months: 30 * 24 * 60 * 60 * 1000,
+    years:  365 * 24 * 60 * 60 * 1000,
+  };
+  return value * (ms[unit] ?? ms.days);
+}
+
+function durationLabel(value: number, unit: string): string {
+  const names: Record<string, string> = {
+    hours: "Hour", days: "Day", weeks: "Week", months: "Month", years: "Year",
+  };
+  const name = names[unit] ?? unit;
+  return `${value} ${name}${value !== 1 ? "s" : ""}`;
+}
+
+interface VIPPlan {
+  id: string;
+  label: string;
+  tag: string;
+  tagColor: string;
+  price: number;
+  durationMs: number;
+  durationLabel: string;
+}
+
+const DEFAULT_PLANS: VIPPlan[] = [
+  { id: "week1",   label: "1 Week Pass",   tag: "TRY IT",   tagColor: "#888",    price: 10000, durationMs: durationToMs(7, "days"),   durationLabel: "7 Days" },
+  { id: "month1",  label: "1 Month Pass",  tag: "POPULAR",  tagColor: "#f5a623", price: 30000, durationMs: durationToMs(1, "months"), durationLabel: "1 Month" },
+  { id: "months3", label: "3 Months Pass", tag: "BEST DEAL",tagColor: "#059669", price: 75000, durationMs: durationToMs(3, "months"), durationLabel: "3 Months" },
 ];
 
 const BENEFITS = [
@@ -45,11 +75,27 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
 
   useEffect(() => {
     fbApi.settings.get().then((s: any) => {
-      if (s) {
+      if (!s) return;
+      // Try new dynamic vipPlans format first
+      const dynamicPlans = Array.isArray(s.vipPlans) && s.vipPlans.length > 0
+        ? s.vipPlans.filter((p: any) => p.active !== false)
+        : null;
+      if (dynamicPlans && dynamicPlans.length > 0) {
+        setPlans(dynamicPlans.map((p: any): VIPPlan => ({
+          id:            p.id || `plan_${Math.random().toString(36).slice(2)}`,
+          label:         p.label || "Plan",
+          tag:           p.tag || "PLAN",
+          tagColor:      p.tagColor || "#888",
+          price:         Number(p.price || 0),
+          durationMs:    durationToMs(Number(p.durationValue || 1), p.durationUnit || "months"),
+          durationLabel: durationLabel(Number(p.durationValue || 1), p.durationUnit || "months"),
+        })));
+      } else {
+        // Fall back to legacy individual price keys
         setPlans([
-          { id: "week1", label: "1 Week Pass", tag: "TRY IT", tagColor: "#888", price: Number(s.plan1WeekPrice ?? 10000), days: 7 },
-          { id: "month1", label: "1 Month Pass", tag: "POPULAR", tagColor: "#f5a623", price: Number(s.plan1MonthPrice ?? 30000), days: 30 },
-          { id: "months3", label: "3 Months Pass", tag: "BEST DEAL", tagColor: "#059669", price: Number(s.plan3MonthsPrice ?? 75000), days: 90 },
+          { id: "week1",   label: "1 Week Pass",   tag: "TRY IT",   tagColor: "#888",    price: Number(s.plan1WeekPrice   ?? 10000), durationMs: durationToMs(7,"days"),   durationLabel: "7 Days" },
+          { id: "month1",  label: "1 Month Pass",  tag: "POPULAR",  tagColor: "#f5a623", price: Number(s.plan1MonthPrice  ?? 30000), durationMs: durationToMs(1,"months"), durationLabel: "1 Month" },
+          { id: "months3", label: "3 Months Pass", tag: "BEST DEAL",tagColor: "#059669", price: Number(s.plan3MonthsPrice ?? 75000), durationMs: durationToMs(3,"months"), durationLabel: "3 Months" },
         ]);
       }
     }).catch(() => {}).finally(() => setPlansLoaded(true));
@@ -78,7 +124,7 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
     if (!user) return;
     if (activatedRef.current) return;
     activatedRef.current = true;
-    const expiresAt = Date.now() + plan.days * 24 * 60 * 60 * 1000;
+    const expiresAt = Date.now() + plan.durationMs;
     await fbApi.subscriptions.create({
       userId: user.uid,
       userEmail: user.email || profile?.email || "",
@@ -297,7 +343,7 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
                 Enjoy full access to all content!
               </div>
               <div style={{ fontSize: 11, color: "#aaa" }}>
-                Expires in {plan.days} day{plan.days > 1 ? "s" : ""}
+                Expires in {plan.durationLabel}
               </div>
               <button
                 onClick={onClose}
@@ -316,7 +362,7 @@ export default function VIPModal({ onClose, onSubscribed, onOpenAuth }: VIPModal
                 <div style={{ fontSize: 11, color: "#999", marginBottom: 2 }}>Selected Plan</div>
                 <div style={{ fontSize: 14, fontWeight: 800, color: "#c07800" }}>{plan.label}</div>
                 <div style={{ fontSize: 20, fontWeight: 900, color: "#1a1a1a", lineHeight: 1.2 }}>{formatUGX(plan.price)}</div>
-                <div style={{ fontSize: 10, color: "#aaa", marginTop: 4 }}>Valid for {plan.days} day{plan.days > 1 ? "s" : ""}</div>
+                <div style={{ fontSize: 10, color: "#aaa", marginTop: 4 }}>Valid for {plan.durationLabel}</div>
               </div>
 
               <div style={{ marginBottom: 12 }}>
